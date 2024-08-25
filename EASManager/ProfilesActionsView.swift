@@ -8,21 +8,19 @@
 import SwiftUI
 
 struct ProfilesActionsView: View {
+    @ObservedObject var easViewModel: EASCommandViewModel
+    var profileName: String
+
     var body: some View {
         VStack {
             HStack {
-                Label("Build", systemImage: "hammer.fill")
-                    .foregroundStyle(.blue)
-                    .fontWeight(.medium)
-//                Button("Build", systemImage: "hammer.fill", action: build)
-//                    .labelStyle(.iconOnly)
-//                    .foregroundStyle(.blue)
-//                    .buttonStyle(.plain)
-                
-//                Button("Update", systemImage: "square.2.layers.3d.top.filled", action: update)
-//                    .labelStyle(.iconOnly)
-//                    .foregroundStyle(.blue)
-//                    .buttonStyle(.plain)
+                Button(action: build) {
+                    Label("Build", systemImage: "hammer.fill")
+                        .foregroundStyle(.blue)
+                        .fontWeight(.medium)
+                        .labelStyle(.titleAndIcon)
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal)
         }
@@ -30,9 +28,12 @@ struct ProfilesActionsView: View {
     
     func build() {
         print("Building")
+        easViewModel.runCommand(["build", "--profile", profileName,  "--platform", "ios", "--non-interactive", "--no-wait"])
     }
 }
 
-#Preview {
-    ProfilesActionsView()
-}
+//#Preview {
+//    let projectPath = "/Users/henry/Projects/routinify"
+//    let easViewModel = EASCommandViewModel(projectPath: projectPath)
+//    ProfilesActionsView(easViewModel: easViewModel, profileName: "development")
+//}

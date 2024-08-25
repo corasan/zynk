@@ -10,8 +10,17 @@ import SwiftUI
 struct ProjectView: View {
     @Binding var projectPath: URL?
     @Binding var profiles: [Profile]
-    
+
     @State private var selectedProfile: Profile?
+    @StateObject private var easViewModel: EASCommandViewModel
+    @StateObject private var pathManager = LocalDataManager()
+    
+    init(projectPath: Binding<URL?>, profiles: Binding<[Profile]>) {
+        self._projectPath = projectPath
+        self._profiles = profiles
+        let path = projectPath.wrappedValue?.path ?? ""
+        self._easViewModel = StateObject(wrappedValue: EASCommandViewModel(projectPath: path, pathManager: LocalDataManager()))
+    }
     
     var body: some View {
         NavigationSplitView {
@@ -27,7 +36,7 @@ struct ProjectView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         ProfileDetailsView(profile: profile)
-                        ProfilesActionsView()
+                        ProfilesActionsView(easViewModel: easViewModel, profileName: profile.name)
                         Spacer()
                     }
                     Spacer()
