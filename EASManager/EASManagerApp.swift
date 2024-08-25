@@ -25,7 +25,6 @@ struct EASManagerApp: App {
     @State private var isProjectSelected = false
     @State private var profiles: [Profile] = []
     @State private var projectPath: URL?
-    @State private var localDataManager = LocalDataManager()
     @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
     @StateObject var eas: EAS
     

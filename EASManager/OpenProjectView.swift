@@ -14,7 +14,6 @@ struct OpenProjectView: View {
 
     @State private var errorMessage: String?
     @State private var isShowingPicker = false
-    @StateObject private var localDataManager = LocalDataManager()
     @AppStorage("cliPath") private var cliPath: String = ""
     @AppStorage("lastOpenedProjectPath") private var lastOpenedProjectPath: String = ""
 
