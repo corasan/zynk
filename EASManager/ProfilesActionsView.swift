@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct ProfilesActionsView: View {
-    @ObservedObject var easViewModel: EASCommandViewModel
+    @EnvironmentObject var eas: EAS
     var profileName: String
 
     var body: some View {
         VStack {
             HStack {
-                Button(action: build) {
+                Button(action: buildIos) {
                     Label("Build", systemImage: "hammer.fill")
                         .foregroundStyle(.blue)
                         .fontWeight(.medium)
@@ -26,14 +26,13 @@ struct ProfilesActionsView: View {
         }
     }
     
-    func build() {
-        print("Building")
-        easViewModel.runCommand(["build", "--profile", profileName,  "--platform", "ios", "--non-interactive", "--no-wait"])
+    func buildIos() {
+        eas.buildIos(profile: profileName)
     }
 }
 
-//#Preview {
-//    let projectPath = "/Users/henry/Projects/routinify"
-//    let easViewModel = EASCommandViewModel(projectPath: projectPath)
-//    ProfilesActionsView(easViewModel: easViewModel, profileName: "development")
-//}
+#Preview {
+    @Previewable @StateObject var eas = EAS()
+    ProfilesActionsView(profileName: "development")
+        .environmentObject(eas)
+}

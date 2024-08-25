@@ -13,21 +13,13 @@ class EASCommandViewModel: ObservableObject {
     @Published var error: String?
     @Published var isLoading: Bool = false
     
-    let projectPath: String
-    let pathManager: LocalDataManager
-    
-    init(projectPath: String, pathManager: LocalDataManager) {
-        self.projectPath = projectPath
-        self.pathManager = pathManager
-    }
-    
     func runCommand(_ arguments: [String]) {
         isLoading = true
         
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
             
-            let result = CLIUtils.runEASCommand(arguments, in: self.projectPath, cliPath: self.pathManager.cliPath)
+            let result = CLIUtils.runEASCommand(arguments)
             
             DispatchQueue.main.async {
                 self.output = result.output ?? ""

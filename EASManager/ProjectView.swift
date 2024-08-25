@@ -8,24 +8,15 @@
 import SwiftUI
 
 struct ProjectView: View {
-    @Binding var projectPath: URL?
-    @Binding var profiles: [Profile]
-
-    @State private var selectedProfile: Profile?
-    @StateObject private var easViewModel: EASCommandViewModel
-    @StateObject private var pathManager = LocalDataManager()
+    @EnvironmentObject var eas: EAS
+    @State var selectedProfile: Profile?
+    @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
     
-    init(projectPath: Binding<URL?>, profiles: Binding<[Profile]>) {
-        self._projectPath = projectPath
-        self._profiles = profiles
-        let path = projectPath.wrappedValue?.path ?? ""
-        self._easViewModel = StateObject(wrappedValue: EASCommandViewModel(projectPath: path, pathManager: LocalDataManager()))
-    }
     
     var body: some View {
         NavigationSplitView {
             VStack(alignment: .leading) {
-                List(profiles, selection: $selectedProfile) { profile in
+                List(eas.profiles, selection: $selectedProfile) { profile in
                     NavigationLink(value: profile) {
                         Text(profile.name)
                     }
@@ -36,8 +27,9 @@ struct ProjectView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         ProfileDetailsView(profile: profile)
-                        ProfilesActionsView(easViewModel: easViewModel, profileName: profile.name)
+                        ProfilesActionsView(profileName: profile.name)
                         Spacer()
+                        SecretsTable()
                     }
                     Spacer()
                 }
@@ -47,7 +39,7 @@ struct ProjectView: View {
             }
         }
         .onAppear {
-            if selectedProfile == nil, let firstProfile = profiles.first {
+            if selectedProfile == nil, let firstProfile = eas.profiles.first {
                 selectedProfile = firstProfile
             }
         }
@@ -55,8 +47,9 @@ struct ProjectView: View {
 }
 
 #Preview {
-    @Previewable @State var profiles: [Profile] = [Profile(name: "development", developmentBuild: true, channel: "development", distribution: .internal)]
-    @Previewable @State var projectPath: URL? = URL(filePath: "/Users/henry/Projects/routinify")
+    @Previewable @State var eas = EAS()
 
-    ProjectView(projectPath: $projectPath, profiles: $profiles)
+    ProjectView()
+        .environmentObject(eas)
+
 }

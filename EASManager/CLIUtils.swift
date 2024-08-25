@@ -6,9 +6,18 @@
 //
 
 import Foundation
+import SwiftUI
 
 class CLIUtils {
-    static func runEASCommand(_ arguments: [String], in projectPath: String, cliPath: String) -> (output: String?, error: String?) {
+    private static var cliPath: String {
+        UserDefaults.standard.string(forKey: "cliPath") ?? ""
+    }
+    
+    private static var projectPath: String {
+        UserDefaults.standard.string(forKey: "lastOpenedProjectPath") ?? ""
+    }
+    
+    static func runEASCommand(_ arguments: [String]) -> (output: String?, error: String?) {
         print("--- Starting EAS Command Execution ---")
         print("CLI Path: \(cliPath)")
         print("Project Path: \(projectPath)")
@@ -50,7 +59,6 @@ class CLIUtils {
         task.standardOutput = outputPipe
         task.standardError = errorPipe
         task.currentDirectoryURL = URL(fileURLWithPath: projectPath)
-        
         
         do {
             try task.run()

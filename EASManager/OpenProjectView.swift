@@ -14,18 +14,19 @@ struct OpenProjectView: View {
 
     @State private var errorMessage: String?
     @State private var isShowingPicker = false
-    @StateObject private var pathManager = LocalDataManager()
-    
+    @StateObject private var localDataManager = LocalDataManager()
+    @AppStorage("cliPath") private var cliPath: String = ""
+    @AppStorage("lastOpenedProjectPath") private var lastOpenedProjectPath: String = ""
 
     var body: some View {
         VStack {
             Text("Select a project")
                 .font(.largeTitle)
-            Text("EAS CLI Path: \(pathManager.cliPath)")
+            Text("EAS CLI Path: \(cliPath)")
                 .padding(.bottom)
-            if pathManager.cliPath.isEmpty {
+            if cliPath.isEmpty {
                 HStack {
-                    TextField("EAS CLI Path", text: $pathManager.cliPath)
+                    TextField("EAS CLI Path", text: $cliPath)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
                 }
@@ -41,6 +42,7 @@ struct OpenProjectView: View {
                 switch result {
                 case .success(let folders):
                     if let folder = folders.first {
+                        lastOpenedProjectPath = folder.relativePath
                         projectPath = folder
                         readEASJson(in: folder)
                         isProjectSelected = true
