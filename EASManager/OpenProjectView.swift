@@ -14,11 +14,22 @@ struct OpenProjectView: View {
 
     @State private var errorMessage: String?
     @State private var isShowingPicker = false
+    @StateObject private var pathManager = LocalDataManager()
+    
 
     var body: some View {
         VStack {
             Text("Select a project")
                 .font(.largeTitle)
+            Text("EAS CLI Path: \(pathManager.cliPath)")
+                .padding(.bottom)
+            if pathManager.cliPath.isEmpty {
+                HStack {
+                    TextField("EAS CLI Path", text: $pathManager.cliPath)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding()
+                }
+            }
             Button("Open project") {
                 isShowingPicker = true
             }
