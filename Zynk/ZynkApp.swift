@@ -21,7 +21,7 @@ class MyAppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 }
 
 @main
-struct EASManagerApp: App {
+struct ZynkApp: App {
     @State private var isProjectSelected = false
     @State private var profiles: [Profile] = []
     @State private var projectPath: URL?
