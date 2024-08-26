@@ -60,8 +60,10 @@ struct ProjectView: View {
                     Button(action: {
                         
                     }) {
-                        Label("Update", systemImage: "icloud.and.arrow.up")
-                            .labelStyle(.iconOnly)
+                        HStack {
+                            Label("Update", systemImage: "icloud.and.arrow.up")
+                                .labelStyle(.iconOnly)
+                        }
                     }
                 }
             }

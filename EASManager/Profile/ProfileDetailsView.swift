@@ -20,17 +20,34 @@ struct ProfileDetailsView: View {
                         .fontWeight(.semibold)
                 }
                 Text("Project Name: \(eas.projectName)")
-                Text("Updates channel: \(profile.channel)")
-                Text("Distribution: \(profile.distribution.description)")
-                Text("Development Build: \(profile.developmentBuild ? "Yes" : "No")")
+                Text("Updates channel: \(profile.channel.lowercased())")
+                Text("Distribution: \(profile.distribution.description.lowercased())")
+                Text("Development build: \(profile.developmentBuild ? "Yes" : "No")")
             }
-            .padding()
+            Spacer()
+            if eas.isBuildLoading {
+                HStack {
+                    Text("Starting build in EAS Server...")
+                    Image(systemName: "progress.indicator")
+                        .symbolEffect(.variableColor.iterative.hideInactiveLayers.nonReversing)
+                }
+            }
+            if eas.isUpdateLoading {
+                HStack {
+                    Text("Creating OTA Update for branch: \(profile.channel)")
+                    Image(systemName: "progress.indicator")
+                        .symbolEffect(.variableColor.iterative.hideInactiveLayers.nonReversing)
+                }
+            }
         }
+        .padding()
+
     }
 }
 
 #Preview {
+    @Previewable @State var eas = EAS()
     @Previewable var profile = Profile(name: "Test Project", developmentBuild: true, channel: "Staging", distribution: .internal)
-
     ProfileDetailsView(profile: profile)
+        .environmentObject(eas)
 }

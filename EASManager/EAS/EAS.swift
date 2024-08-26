@@ -18,6 +18,8 @@ class EAS: ObservableObject {
     @Published var error: String?
     @Published var isLoading: Bool = false
     @Published var projectName: String = ""
+    @Published var isUpdateLoading: Bool = false
+    @Published var isBuildLoading: Bool = false
     
     init() {
         projectPath = UserDefaults.standard.string(forKey: "lastOpenedProjectPath") ?? ""
@@ -28,14 +30,20 @@ class EAS: ObservableObject {
     }
     
     func build(profile: String, platform: EASPlatform = .all) {
-        runCommand(["build", "--profile", profile,  "--platform", platform.description, "--non-interactive", "--no-wait"])
+        isBuildLoading = true
+        runCommand(["build", "--profile", profile,  "--platform", platform.description, "--non-interactive", "--no-wait"]) { loading in
+            self.isBuildLoading = loading
+        }
     }
     
     func update(profile: String, platform: EASPlatform = .all) {
-        runCommand(["update", "--branch", profile,  "--platform", platform.description, "--auto"])
+        isUpdateLoading = true
+        runCommand(["update", "--branch", profile,  "--platform", platform.description, "--auto"]) { loading in
+            self.isUpdateLoading = loading
+        }
     }
     
-    private func runCommand(_ arguments: [String]) {
+    private func runCommand(_ arguments: [String], completion: @escaping (Bool) -> Void) {
         isLoading = true
         
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -50,6 +58,7 @@ class EAS: ObservableObject {
                     self.error = "Command executed but produced no output. Please check if the EAS CLI path is correct."
                 }
                 self.isLoading = false
+                completion(self.isLoading)
             }
         }
     }
