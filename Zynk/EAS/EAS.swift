@@ -13,7 +13,6 @@ class EAS: ObservableObject {
     @State private var errorMessage: String?
     
     @Published var projectPath: String = ""
-    @Published var cliPath: String = ""
     @Published var output: String = ""
     @Published var error: String?
     @Published var isLoading: Bool = false
@@ -21,12 +20,13 @@ class EAS: ObservableObject {
     @Published var isUpdateLoading: Bool = false
     @Published var isBuildLoading: Bool = false
     
+    @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
+    @AppStorage("cliPath") var cliPath: String = ""
+    @AppStorage("lastOpenedProjectName") var lastOpenedProjectName: String = ""
+    
     init() {
-        projectPath = UserDefaults.standard.string(forKey: "lastOpenedProjectPath") ?? ""
-        cliPath = UserDefaults.standard.string(forKey: "cliPath") ?? ""
+        projectPath = lastOpenedProjectPath
         projectName = UserDefaults.standard.string(forKey: "lastOpenedProjectName") ?? ""
-        readEASJson()
-        readAppJson()
     }
     
     func build(profile: String, platform: EASPlatform = .all) {
@@ -62,10 +62,6 @@ class EAS: ObservableObject {
             }
         }
     }
-    
-    func addProfile(_ profile: Profile) {
-        profiles.append(profile)
-    }
 
     func readEASJson() {
         let url = URL(fileURLWithPath: projectPath)
@@ -91,35 +87,73 @@ class EAS: ObservableObject {
                                    channel: channel,
                                    distribution: distribution)
                 }
-//                errorMessage = nil
+                errorMessage = nil
             } else {
-//                errorMessage = "Failed to find 'build' key or it's not in the expected format"
+                errorMessage = "Failed to find 'build' key or it's not in the expected format"
             }
         } catch {
-//            errorMessage = "Error reading or parsing eas.json: \(error.localizedDescription)"
+            errorMessage = "Error reading or parsing eas.json: \(error.localizedDescription)"
         }
     }
     
     func readAppJson() {
         let url = URL(fileURLWithPath: projectPath)
         let appJsonURL = url.appendingPathComponent("app.json")
-        print(appJsonURL)
         
         do {
             let data = try Data(contentsOf: appJsonURL)
             let json = try JSONSerialization.jsonObject(with: data, options: [])
             
             if let dictionary = json as? [String: Any] {
-//                print("in here, dictionary is not nil")
                 if let expo = dictionary["expo"] as? [String: Any] {
-//                    print("in here, expo is not nil")
                     if let name = expo["name"] as? String {
                         UserDefaults.standard.set(name, forKey: "lastOpenedProjectName")
                     }
                 }
             }
         } catch {
-//            print("Error reading app.json: \(error.localizedDescription)")
+            print("Error reading app.json: \(error.localizedDescription)")
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func saveSecurityScopedBookmark(for url: URL) {
+        guard url.startAccessingSecurityScopedResource() else {
+            errorMessage = "Error accessing security scoped resource"
+            print(errorMessage ?? "")
+            return
+        }
+        do {
+            let bookmark = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+            UserDefaults.standard.set(bookmark, forKey: "projectFolderBookmark")
+        } catch {
+            print("Error saving bookmark: \(error.localizedDescription)")
+        }
+    }
+    
+    func loadSecurityScopedBookmark() {
+        guard let bookmarkData = UserDefaults.standard.data(forKey: "projectFolderBookmark") else { return }
+        
+        do {
+            var isStale = false
+            let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale)
+            
+            if isStale {
+                // Bookmark is stale, you might want to ask the user to select the folder again
+                errorMessage = "The saved project location is no longer accessible. Please select the project folder again."
+                return
+            }
+            
+            if url.startAccessingSecurityScopedResource() {
+                projectPath = url.path
+                readEASJson()
+                readAppJson()
+                url.stopAccessingSecurityScopedResource()
+            } else {
+                errorMessage = "Failed to access the project folder. Please select it again."
+            }
+        } catch {
+            errorMessage = "Error accessing project folder: \(error.localizedDescription)"
         }
     }
 }

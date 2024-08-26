@@ -55,7 +55,6 @@ class SecretsManager: ObservableObject {
             let newSecrets = lines.compactMap { line -> Secret? in
                 let parts = line.components(separatedBy: "=")
                 guard parts.count == 2 else {
-//                    print("Skipping invalid line: \(line)")
                     return nil
                 }
                 
@@ -113,40 +112,37 @@ class SecretsManager: ObservableObject {
     }
     
     private func writeToFile() {
-        guard let appDirectory = getProjectDirectory() else { return }
+        guard let appDirectory = getProjectDirectory() else {
+            print("Error: Unable to get project directory")
+            return
+        }
         
         let fileName = ".env.\(profileName)"
         let fileContent = secrets.map { "\($0.variable)=\"\($0.value)\"" }.joined(separator: "\n")
         let fileURL = appDirectory.appendingPathComponent(fileName)
         
         do {
+            try FileManager.default.createDirectory(at: appDirectory, withIntermediateDirectories: true, attributes: nil)
             try fileContent.write(to: fileURL, atomically: true, encoding: .utf8)
-//            print("File written successfully to \(fileURL.path)")
+            print("File written successfully to \(fileURL.path)")
         } catch {
-//            print("Error writing file: \(error.localizedDescription)")
+            print("Error writing file: \(error.localizedDescription)")
         }
     }
     
     private func getProjectDirectory() -> URL? {
-        guard let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-//            print("Error: Unable to find application support directory")
-            return nil
-        }
+        let homeDirectory = FileManager.default.homeDirectoryForCurrentUser
+        let zynkDirectory = homeDirectory.appendingPathComponent(".zynk", isDirectory: true)
+        let projectDirectory = zynkDirectory.appendingPathComponent(projectName, isDirectory: true)
         
-        let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.henrypl.eas-manager"
-        let appDirectory = appSupportDirectory.appendingPathComponent(bundleIdentifier, isDirectory: true)
-        let projectDirectory = appDirectory.appendingPathComponent(projectName, isDirectory: true)
-        
-        // Create the directory if it doesn't exist
-        if !FileManager.default.fileExists(atPath: appDirectory.path) {
+        if !FileManager.default.fileExists(atPath: zynkDirectory.path) {
             do {
-                try FileManager.default.createDirectory(at: appDirectory, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.createDirectory(at: zynkDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-//                print("Error creating app directory: \(error.localizedDescription)")
+                print("Error creating .zynk directory: \(error.localizedDescription)")
                 return nil
             }
         }
-        
         return projectDirectory
     }
 }

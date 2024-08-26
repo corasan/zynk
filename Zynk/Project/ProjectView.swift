@@ -23,7 +23,7 @@ struct ProjectView: View {
                 }
             }
         } detail: {
-            if let profile = selectedProfile {
+            if !eas.profiles.isEmpty, let profile = selectedProfile {
                 HStack {
                     VStack(alignment: .leading) {
                         ProfileDetailsView(profile: profile)
@@ -35,12 +35,9 @@ struct ProjectView: View {
                     }
                     Spacer()
                 }
-            } else {
+            }
+            if eas.profiles.isEmpty {
                 OpenProjectView()
-//                    .frame(minWidth: 360, minHeight: 220)
-//                    .environmentObject(eas)
-//                Text("Select a profile to view details")
-//                    .foregroundColor(.secondary)
             }
         }
         .navigationTitle(selectedProfile?.name.capitalized ?? "")
@@ -51,35 +48,30 @@ struct ProjectView: View {
                     Button("Build Android", action: {  build(.android) })
                     Button("Build all", action: { build() })
                 } label: {
-                    Button(action: {}) {
-                        Label("Build", systemImage: "hammer")
-                            .labelStyle(.iconOnly)
-                    }
+                    Label("Build", systemImage: "hammer")
+                        .labelStyle(.iconOnly)
                 }
                 Menu {
                     Button("Update iOS", action: { update(.ios) })
                     Button("Update Android", action: { update(.android)})
                     Button("Update all", action: { update() })
                 } label: {
-                    Button(action: {
-                        
-                    }) {
-                        HStack {
-                            Label("Update", systemImage: "icloud.and.arrow.up")
-                                .labelStyle(.iconOnly)
-                        }
-                    }
+                    Label("Update", systemImage: "icloud.and.arrow.up")
+                        .labelStyle(.iconOnly)
                 }
             }
         }
         .onAppear {
+            if !eas.projectPath.isEmpty {
+                eas.loadSecurityScopedBookmark()
+            }
             if selectedProfile == nil, let firstProfile = eas.profiles.first {
                 selectedProfile = firstProfile
             }
         }
         .onChange(of: eas.profiles) { oldValue, newValue in
-            if let selectedProfile = newValue.first(where: { $0.name == self.selectedProfile?.name }) {
-                self.selectedProfile = selectedProfile
+            if selectedProfile == nil, let firstProfile = eas.profiles.first {
+                selectedProfile = firstProfile
             }
         }
     }
