@@ -7,19 +7,6 @@
 
 import SwiftUI
 
-//struct VerticalLabeledContentStyle: LabeledContentStyle {
-//    func makeBody(configuration: Configuration) -> some View {
-//        VStack(alignment: .leading) {
-//            configuration.label
-//            configuration.content
-//        }
-//    }
-//}
-//
-//extension LabeledContentStyle where Self == VerticalLabeledContentStyle {
-//    static var vertical: VerticalLabeledContentStyle { .init() }
-//}
-
 struct AddSecretButton: View {
     @State private var isPresented = false
 
@@ -32,7 +19,6 @@ struct AddSecretButton: View {
                 .fontWeight(.medium)
                 .labelStyle(.iconOnly)
         }
-        .buttonStyle(.plain)
         .sheet(isPresented: $isPresented) {
             AddSecretView(isPresented: $isPresented)
         }
@@ -54,11 +40,13 @@ struct AddSecretView: View {
                 TextField("Value", text: $value)
             }
             HStack {
-                Button("Cancel", action: {
+                Button("Cancel",role: .cancel, action: {
                     isPresented.toggle()
                 })
                 Spacer()
                 Button("Save", action: saveSecret)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(variable.isEmpty || value.isEmpty)
             }
             .padding(.top, 16)
         }

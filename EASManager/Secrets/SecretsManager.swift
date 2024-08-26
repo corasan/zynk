@@ -81,7 +81,7 @@ class SecretsManager: ObservableObject {
         }
     }
     
-    func copyEnvFile() {
+    private func copyEnvFile() {
         guard let sourceDirectory = getProjectDirectory() else {
             print("Error: Could not get source directory")
             return

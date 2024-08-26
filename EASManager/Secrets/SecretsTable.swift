@@ -22,7 +22,7 @@ struct SecretsTable: View {
     
     var body: some View {
         VStack {
-            Table(secretsManager.secrets ,selection: $selectedRow, sortOrder: $sortOrder) {
+            Table(secretsManager.secrets, selection: $selectedRow, sortOrder: $sortOrder) {
                 TableColumn("Variable", value: \.variable)
                 TableColumn("Value", value: \.value)
             }
@@ -36,7 +36,6 @@ struct SecretsTable: View {
                         .fontWeight(.medium)
                         .labelStyle(.iconOnly)
                 }
-                .buttonStyle(.plain)
                 Spacer()
             }
             .padding(.horizontal)
@@ -56,7 +55,11 @@ struct SecretsTable: View {
     
     func removeItem() {
         if !secretsManager.secrets.isEmpty {
-//            secrets.removeLast()
+            if let selected = selectedRow {
+                if let index = secretsManager.secrets.firstIndex(where: { $0.id == selected}) {
+                    secretsManager.removeItem(at: IndexSet(integer: index))
+                }
+            }
         }
     }
 }
