@@ -26,7 +26,6 @@ struct ProjectView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         ProfileDetailsView(profile: profile)
-                        ProfilesActionsView(profileName: profile.name)
                         Spacer()
                         SecretsTable(profile: Binding(
                             get: { profile.name },
@@ -44,8 +43,8 @@ struct ProjectView: View {
         .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {
                 Menu {
-                    Button("Build iOS", action: { build(platform: .ios) })
-                    Button("Build Android", action: {  build(platform: .android) })
+                    Button("Build iOS", action: { build(.ios) })
+                    Button("Build Android", action: {  build(.android) })
                     Button("Build all", action: { build() })
                 } label: {
                     Button(action: {}) {
@@ -54,15 +53,9 @@ struct ProjectView: View {
                     }
                 }
                 Menu {
-                    Button("Update iOS", action: {
-                        print("Update iOS")
-                    })
-                    Button("Update Android", action: {
-                        print("Update Android")
-                    })
-                    Button("Update all", action: {
-                        print("Update Android")
-                    })
+                    Button("Update iOS", action: { update(.ios) })
+                    Button("Update Android", action: { update(.android)})
+                    Button("Update all", action: { update() })
                 } label: {
                     Button(action: {
                         
@@ -80,9 +73,14 @@ struct ProjectView: View {
         }
     }
     
-    func build(platform: EASPlatform = .all) {
+    func build(_ platform: EASPlatform = .all) {
         let name = selectedProfile?.name ?? ""
         eas.build(profile: name, platform: platform)
+    }
+    
+    func update(_ platform: EASPlatform = .all) {
+        let name = selectedProfile?.name ?? ""
+        eas.update(profile: name, platform: platform)
     }
 }
 

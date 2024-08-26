@@ -31,12 +31,8 @@ class EAS: ObservableObject {
         runCommand(["build", "--profile", profile,  "--platform", platform.description, "--non-interactive", "--no-wait"])
     }
     
-    func buildAndroid(profile: String) {
-        runCommand(["build", "--profile", profile,  "--platform", "android", "--non-interactive", "--no-wait"])
-    }
-    
-    func buildAll(profile: String) {
-        runCommand(["build", "--profile", profile,  "--platform", "all", "--non-interactive", "--no-wait"])
+    func update(profile: String, platform: EASPlatform = .all) {
+        runCommand(["update", "--branch", profile,  "--platform", platform.description, "--auto"])
     }
     
     private func runCommand(_ arguments: [String]) {
@@ -127,11 +123,11 @@ enum EASPlatform: String, CustomStringConvertible {
     var description: String {
         switch self {
         case .ios:
-            return "iOS"
+            return "ios"
         case .android:
-            return "Android"
+            return "android"
         case .all:
-            return "All"
+            return "all"
         }
     }
     
