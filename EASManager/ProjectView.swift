@@ -12,7 +12,6 @@ struct ProjectView: View {
     @State var selectedProfile: Profile?
     @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
     
-    
     var body: some View {
         NavigationSplitView {
             VStack(alignment: .leading) {
@@ -29,7 +28,10 @@ struct ProjectView: View {
                         ProfileDetailsView(profile: profile)
                         ProfilesActionsView(profileName: profile.name)
                         Spacer()
-                        SecretsTable()
+                        SecretsTable(profile: Binding(
+                            get: { profile.name },
+                            set: { newValue in }
+                        ))
                     }
                     Spacer()
                 }

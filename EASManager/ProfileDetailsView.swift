@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProfileDetailsView: View {
     var profile: Profile
+    @EnvironmentObject var eas: EAS
 
     var body: some View {
         HStack(alignment: .top) {
@@ -18,7 +19,7 @@ struct ProfileDetailsView: View {
                         .font(.largeTitle)
                         .fontWeight(.semibold)
                 }
-                
+                Text("Project Name: \(eas.projectName)")
                 Text("Updates channel: \(profile.channel)")
                 Text("Distribution: \(profile.distribution.description)")
                 Text("Development Build: \(profile.developmentBuild ? "Yes" : "No")")

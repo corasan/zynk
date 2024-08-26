@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct OpenProjectView: View {
+    @EnvironmentObject var eas: EAS
     @Binding var isProjectSelected: Bool
     @Binding var profiles: [Profile]
     @Binding var projectPath: URL?
@@ -16,6 +17,7 @@ struct OpenProjectView: View {
     @State private var isShowingPicker = false
     @AppStorage("cliPath") private var cliPath: String = ""
     @AppStorage("lastOpenedProjectPath") private var lastOpenedProjectPath: String = ""
+    @AppStorage("lastOpenedProjectName") private var lastOpenedProjectName: String = ""
 
     var body: some View {
         VStack {
@@ -43,7 +45,7 @@ struct OpenProjectView: View {
                     if let folder = folders.first {
                         lastOpenedProjectPath = folder.relativePath
                         projectPath = folder
-                        readEASJson(in: folder)
+                        eas.readEASJson()
                         isProjectSelected = true
                     }
                 case .failure(let error):

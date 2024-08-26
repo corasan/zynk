@@ -17,11 +17,14 @@ class EAS: ObservableObject {
     @Published var output: String = ""
     @Published var error: String?
     @Published var isLoading: Bool = false
+    @Published var projectName: String = ""
     
     init() {
         projectPath = UserDefaults.standard.string(forKey: "lastOpenedProjectPath") ?? ""
         cliPath = UserDefaults.standard.string(forKey: "cliPath") ?? ""
+        projectName = UserDefaults.standard.string(forKey: "lastOpenedProjectName") ?? ""
         readEASJson()
+        readAppJson()
     }
     
     func buildIos(profile: String) {
@@ -89,6 +92,29 @@ class EAS: ObservableObject {
             }
         } catch {
 //            errorMessage = "Error reading or parsing eas.json: \(error.localizedDescription)"
+        }
+    }
+    
+    func readAppJson() {
+        let url = URL(fileURLWithPath: projectPath)
+        let appJsonURL = url.appendingPathComponent("app.json")
+        print(appJsonURL)
+        
+        do {
+            let data = try Data(contentsOf: appJsonURL)
+            let json = try JSONSerialization.jsonObject(with: data, options: [])
+            
+            if let dictionary = json as? [String: Any] {
+                print("in here, dictionary is not nil")
+                if let expo = dictionary["expo"] as? [String: Any] {
+                    print("in here, expo is not nil")
+                    if let name = expo["name"] as? String {
+                        UserDefaults.standard.set(name, forKey: "lastOpenedProjectName")
+                    }
+                }
+            }
+        } catch {
+            print("Error reading app.json: \(error.localizedDescription)")
         }
     }
 }
