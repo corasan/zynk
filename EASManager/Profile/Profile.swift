@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum DistributionType: String, Codable, CustomStringConvertible {
+enum DistributionType: String, CustomStringConvertible {
     case `internal` = "internal"
     case store = "store"
     

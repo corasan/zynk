@@ -40,18 +40,54 @@ struct ProjectView: View {
                     .foregroundColor(.secondary)
             }
         }
+        .navigationTitle(selectedProfile?.name.capitalized ?? "")
+        .toolbar {
+            ToolbarItemGroup(placement: .confirmationAction) {
+                Menu {
+                    Button("Build iOS", action: { build(platform: .ios) })
+                    Button("Build Android", action: {  build(platform: .android) })
+                    Button("Build all", action: { build() })
+                } label: {
+                    Button(action: {}) {
+                        Label("Build", systemImage: "hammer")
+                            .labelStyle(.iconOnly)
+                    }
+                }
+                Menu {
+                    Button("Update iOS", action: {
+                        print("Update iOS")
+                    })
+                    Button("Update Android", action: {
+                        print("Update Android")
+                    })
+                    Button("Update all", action: {
+                        print("Update Android")
+                    })
+                } label: {
+                    Button(action: {
+                        
+                    }) {
+                        Label("Update", systemImage: "icloud.and.arrow.up")
+                            .labelStyle(.iconOnly)
+                    }
+                }
+            }
+        }
         .onAppear {
             if selectedProfile == nil, let firstProfile = eas.profiles.first {
                 selectedProfile = firstProfile
             }
         }
     }
+    
+    func build(platform: EASPlatform = .all) {
+        let name = selectedProfile?.name ?? ""
+        eas.build(profile: name, platform: platform)
+    }
 }
 
 #Preview {
     @Previewable @State var eas = EAS()
-
     ProjectView()
         .environmentObject(eas)
-
 }

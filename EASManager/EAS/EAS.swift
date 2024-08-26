@@ -27,8 +27,8 @@ class EAS: ObservableObject {
         readAppJson()
     }
     
-    func buildIos(profile: String) {
-        runCommand(["build", "--profile", profile,  "--platform", "ios", "--non-interactive", "--no-wait"])
+    func build(profile: String, platform: EASPlatform = .all) {
+        runCommand(["build", "--profile", profile,  "--platform", platform.description, "--non-interactive", "--no-wait"])
     }
     
     func buildAndroid(profile: String) {
@@ -115,6 +115,36 @@ class EAS: ObservableObject {
             }
         } catch {
             print("Error reading app.json: \(error.localizedDescription)")
+        }
+    }
+}
+
+enum EASPlatform: String, CustomStringConvertible {
+    case ios = "ios"
+    case android = "android"
+    case all = "all"
+    
+    var description: String {
+        switch self {
+        case .ios:
+            return "iOS"
+        case .android:
+            return "Android"
+        case .all:
+            return "All"
+        }
+    }
+    
+    init?(rawValue: String) {
+        switch rawValue.lowercased() {
+        case "ios":
+            self = .ios
+        case "android":
+            self = .android
+        case "all":
+            self = .all
+        default:
+            return nil
         }
     }
 }
