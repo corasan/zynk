@@ -24,19 +24,19 @@ class CLIUtils {
         print("Arguments: \(arguments)")
         
         guard !cliPath.isEmpty else {
-            print("Error: EAS CLI path is not set.")
+//            print("Error: EAS CLI path is not set.")
             return (nil, "EAS CLI path is not set. Please set the path in the settings.")
         }
         
         print("Checking if CLI path exists...")
         guard FileManager.default.fileExists(atPath: cliPath) else {
-            print("Error: EAS CLI not found at specified path: \(cliPath)")
+//            print("Error: EAS CLI not found at specified path: \(cliPath)")
             return (nil, "EAS CLI not found at specified path. Please check the path and try again.")
         }
         
-        print("Checking if project path exists...")
+//        print("Checking if project path exists...")
         guard FileManager.default.fileExists(atPath: projectPath) else {
-            print("Error: Project directory not found: \(projectPath)")
+//            print("Error: Project directory not found: \(projectPath)")
             return (nil, "Project directory not found. Please check the project path.")
         }
         
@@ -62,17 +62,16 @@ class CLIUtils {
         
         do {
             try task.run()
-            print("Command started successfully")
-            
-            print("Waiting for command to complete...")
+//            print("Command started successfully")
+//            print("Waiting for command to complete...")
             task.waitUntilExit()
-            print("Command completed with exit status: \(task.terminationStatus)")
+//            print("Command completed with exit status: \(task.terminationStatus)")
         } catch {
-            print("Failed to run EAS command: \(error.localizedDescription)")
+//            print("Failed to run EAS command: \(error.localizedDescription)")
             return (nil, "Failed to run EAS command: \(error.localizedDescription)")
         }
         
-        print("Reading command output...")
+//        print("Reading command output...")
         let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
         let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
         

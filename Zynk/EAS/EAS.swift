@@ -110,16 +110,16 @@ class EAS: ObservableObject {
             let json = try JSONSerialization.jsonObject(with: data, options: [])
             
             if let dictionary = json as? [String: Any] {
-                print("in here, dictionary is not nil")
+//                print("in here, dictionary is not nil")
                 if let expo = dictionary["expo"] as? [String: Any] {
-                    print("in here, expo is not nil")
+//                    print("in here, expo is not nil")
                     if let name = expo["name"] as? String {
                         UserDefaults.standard.set(name, forKey: "lastOpenedProjectName")
                     }
                 }
             }
         } catch {
-            print("Error reading app.json: \(error.localizedDescription)")
+//            print("Error reading app.json: \(error.localizedDescription)")
         }
     }
 }

@@ -55,7 +55,7 @@ class SecretsManager: ObservableObject {
             let newSecrets = lines.compactMap { line -> Secret? in
                 let parts = line.components(separatedBy: "=")
                 guard parts.count == 2 else {
-                    print("Skipping invalid line: \(line)")
+//                    print("Skipping invalid line: \(line)")
                     return nil
                 }
                 
@@ -73,17 +73,17 @@ class SecretsManager: ObservableObject {
                 self.secrets = newSecrets
             }
         } catch {
-            print("Error reading file: \(error.localizedDescription)")
+//            print("Error reading file: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 self.secrets = []
-                print("Cleared secrets array due to error")
+//                print("Cleared secrets array due to error")
             }
         }
     }
     
     private func copyEnvFile() {
         guard let sourceDirectory = getProjectDirectory() else {
-            print("Error: Could not get source directory")
+//            print("Error: Could not get source directory")
             return
         }
         
@@ -91,7 +91,7 @@ class SecretsManager: ObservableObject {
         let sourceURL = sourceDirectory.appendingPathComponent(sourceFileName)
         
         guard let destinationPath = UserDefaults.standard.string(forKey: "lastOpenedProjectPath") else {
-            print("Error: No project path found in UserDefaults")
+//            print("Error: No project path found in UserDefaults")
             return
         }
         
@@ -99,16 +99,16 @@ class SecretsManager: ObservableObject {
 
         // Read the contents of the source file
         guard let sourceData = FileManager.default.contents(atPath: sourceURL.path) else {
-            print("Error: Could not read source file at \(sourceURL.path)")
+//            print("Error: Could not read source file at \(sourceURL.path)")
             return
         }
                 
         do {
             // Write the contents to the destination file
             try sourceData.write(to: destinationURL, options: .atomic)
-            print("File successfully copied to \(destinationURL.path)")
+//            print("File successfully copied to \(destinationURL.path)")
         } catch {
-            print("Error writing file: \(error.localizedDescription)")
+//            print("Error writing file: \(error.localizedDescription)")
         }
     }
     
@@ -121,15 +121,15 @@ class SecretsManager: ObservableObject {
         
         do {
             try fileContent.write(to: fileURL, atomically: true, encoding: .utf8)
-            print("File written successfully to \(fileURL.path)")
+//            print("File written successfully to \(fileURL.path)")
         } catch {
-            print("Error writing file: \(error.localizedDescription)")
+//            print("Error writing file: \(error.localizedDescription)")
         }
     }
     
     private func getProjectDirectory() -> URL? {
         guard let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
-            print("Error: Unable to find application support directory")
+//            print("Error: Unable to find application support directory")
             return nil
         }
         
@@ -142,7 +142,7 @@ class SecretsManager: ObservableObject {
             do {
                 try FileManager.default.createDirectory(at: appDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
-                print("Error creating app directory: \(error.localizedDescription)")
+//                print("Error creating app directory: \(error.localizedDescription)")
                 return nil
             }
         }

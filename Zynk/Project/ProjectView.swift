@@ -11,6 +11,7 @@ struct ProjectView: View {
     @EnvironmentObject var eas: EAS
     @State var selectedProfile: Profile?
     @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
+    @State var isProjectSelected: Bool = false
     
     var body: some View {
         NavigationSplitView {
@@ -35,8 +36,11 @@ struct ProjectView: View {
                     Spacer()
                 }
             } else {
-                Text("Select a profile to view details")
-                    .foregroundColor(.secondary)
+                OpenProjectView()
+//                    .frame(minWidth: 360, minHeight: 220)
+//                    .environmentObject(eas)
+//                Text("Select a profile to view details")
+//                    .foregroundColor(.secondary)
             }
         }
         .navigationTitle(selectedProfile?.name.capitalized ?? "")
@@ -71,6 +75,11 @@ struct ProjectView: View {
         .onAppear {
             if selectedProfile == nil, let firstProfile = eas.profiles.first {
                 selectedProfile = firstProfile
+            }
+        }
+        .onChange(of: eas.profiles) { oldValue, newValue in
+            if let selectedProfile = newValue.first(where: { $0.name == self.selectedProfile?.name }) {
+                self.selectedProfile = selectedProfile
             }
         }
     }

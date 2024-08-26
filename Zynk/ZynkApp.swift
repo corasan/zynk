@@ -40,14 +40,13 @@ struct ZynkApp: App {
                 .environmentObject(eas)
             
         }
-        
         .windowResizability(.contentSize)
-        Window("Open Project", id: "open-project") {
-            OpenProjectView(isProjectSelected: $isProjectSelected, profiles: $profiles, projectPath: $projectPath)
-                .frame(minWidth: 360, minHeight: 220)
-                .environmentObject(eas)
-        }
-        .windowResizability(.contentSize)
+//        Window("Open Project", id: "open-project") {
+//            OpenProjectView(isProjectSelected: $isProjectSelected, profiles: $profiles, projectPath: $projectPath)
+//                .frame(minWidth: 360, minHeight: 220)
+//                .environmentObject(eas)
+//        }
+//        .windowResizability(.contentSize)
 //
 //        WindowGroup {
 //            if isProjectSelected || !lastOpenedProjectPath.isEmpty {
