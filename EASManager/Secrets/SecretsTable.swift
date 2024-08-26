@@ -45,9 +45,6 @@ struct SecretsTable: View {
         }
         .frame(minWidth: 300, minHeight: 200)
         .environmentObject(secretsManager)
-        .onAppear {
-            print("SecretsTable appeared. Number of secrets: \(secretsManager.secrets.count)")
-        }
         .onChange(of: profileName) { oldValue, newValue in
             secretsManager.profileName = newValue
         }

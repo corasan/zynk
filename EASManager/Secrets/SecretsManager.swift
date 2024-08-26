@@ -27,6 +27,7 @@ class SecretsManager: ObservableObject {
     init (profile: String) {
         profileName = profile
         loadFromFile()
+        copyEnvFile()
     }
     
     func addItem(key: String, value: String) {
@@ -70,7 +71,6 @@ class SecretsManager: ObservableObject {
             
             DispatchQueue.main.async {
                 self.secrets = newSecrets
-                print("Updated secrets array. Count: \(self.secrets.count)")
             }
         } catch {
             print("Error reading file: \(error.localizedDescription)")
@@ -78,6 +78,37 @@ class SecretsManager: ObservableObject {
                 self.secrets = []
                 print("Cleared secrets array due to error")
             }
+        }
+    }
+    
+    func copyEnvFile() {
+        guard let sourceDirectory = getProjectDirectory() else {
+            print("Error: Could not get source directory")
+            return
+        }
+        
+        let sourceFileName = ".env.\(profileName)"
+        let sourceURL = sourceDirectory.appendingPathComponent(sourceFileName)
+        
+        guard let destinationPath = UserDefaults.standard.string(forKey: "lastOpenedProjectPath") else {
+            print("Error: No project path found in UserDefaults")
+            return
+        }
+        
+        let destinationURL = URL(fileURLWithPath: destinationPath).appendingPathComponent(".env.local")
+
+        // Read the contents of the source file
+        guard let sourceData = FileManager.default.contents(atPath: sourceURL.path) else {
+            print("Error: Could not read source file at \(sourceURL.path)")
+            return
+        }
+                
+        do {
+            // Write the contents to the destination file
+            try sourceData.write(to: destinationURL, options: .atomic)
+            print("File successfully copied to \(destinationURL.path)")
+        } catch {
+            print("Error writing file: \(error.localizedDescription)")
         }
     }
     
