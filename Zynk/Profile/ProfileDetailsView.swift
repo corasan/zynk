@@ -41,7 +41,6 @@ struct ProfileDetailsView: View {
             }
         }
         .padding()
-
     }
 }
 

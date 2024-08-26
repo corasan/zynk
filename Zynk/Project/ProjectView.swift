@@ -9,9 +9,18 @@ import SwiftUI
 
 struct ProjectView: View {
     @EnvironmentObject var eas: EAS
-    @State var selectedProfile: Profile?
     @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
+    @AppStorage("lastOpenedProfileName") var lastOpenedProfileName = ""
+    @State var selectedProfile: Profile?
     @State var isProjectSelected: Bool = false
+    @State var profileName: String = ""
+    @StateObject var secretsManager: SecretsManager
+    
+    init() {
+        let secretsManager = SecretsManager(profile: "")
+        _secretsManager = StateObject(wrappedValue: secretsManager)
+        secretsManager.profileName = lastOpenedProfileName
+    }
     
     var body: some View {
         NavigationSplitView {
@@ -21,6 +30,10 @@ struct ProjectView: View {
                         Text(profile.name)
                     }
                 }
+                .onChange(of: selectedProfile, initial: true) { oldVal, newVal in
+                    profileName = newVal?.name ?? ""
+                    secretsManager.profileName = profileName
+                }
             }
         } detail: {
             if !eas.profiles.isEmpty, let profile = selectedProfile {
@@ -28,13 +41,14 @@ struct ProjectView: View {
                     VStack(alignment: .leading) {
                         ProfileDetailsView(profile: profile)
                         Spacer()
-                        SecretsTable(profile: Binding(
-                            get: { profile.name },
-                            set: { newValue in }
-                        ))
+                        SecretsTable()
                     }
                     Spacer()
                 }
+                .onAppear {
+                    setProfileNameAndSelectedProfile(profiles: eas.profiles)
+                }
+                .environmentObject(secretsManager)
             }
             if eas.profiles.isEmpty {
                 OpenProjectView()
@@ -65,14 +79,10 @@ struct ProjectView: View {
             if !eas.projectPath.isEmpty {
                 eas.loadSecurityScopedBookmark()
             }
-            if selectedProfile == nil, let firstProfile = eas.profiles.first {
-                selectedProfile = firstProfile
-            }
+            setProfileNameAndSelectedProfile(profiles: eas.profiles)
         }
         .onChange(of: eas.profiles) { oldValue, newValue in
-            if selectedProfile == nil, let firstProfile = eas.profiles.first {
-                selectedProfile = firstProfile
-            }
+            setProfileNameAndSelectedProfile(profiles: newValue)
         }
     }
     
@@ -84,6 +94,14 @@ struct ProjectView: View {
     func update(_ platform: EASPlatform = .all) {
         let name = selectedProfile?.name ?? ""
         eas.update(profile: name, platform: platform)
+    }
+    
+    func setProfileNameAndSelectedProfile(profiles: [Profile]) {
+        if selectedProfile == nil, let firstProfile = profiles.first {
+            selectedProfile = firstProfile
+            profileName = firstProfile.name
+            secretsManager.profileName = firstProfile.name
+        }
     }
 }
 

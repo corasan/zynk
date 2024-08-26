@@ -11,15 +11,8 @@ struct SecretsTable: View {
     @State private var showAddSheet = false
     @State private var selectedRow: Secret.ID?
     @State private var sortOrder = [KeyPathComparator(\Secret.variable)]
-    @StateObject var secretsManager: SecretsManager
-    @Binding var profileName: String
-    
-    init(profile: Binding<String>) {
-        _profileName = profile
-        let secretsManager = SecretsManager(profile: profile.wrappedValue)
-        _secretsManager = StateObject(wrappedValue: secretsManager)
-    }
-    
+    @EnvironmentObject var secretsManager: SecretsManager
+
     var body: some View {
         VStack {
             Table(secretsManager.secrets, selection: $selectedRow, sortOrder: $sortOrder) {
@@ -44,8 +37,11 @@ struct SecretsTable: View {
         }
         .frame(minWidth: 300, minHeight: 200)
         .environmentObject(secretsManager)
-        .onChange(of: profileName) { oldValue, newValue in
-            secretsManager.profileName = newValue
+        .onAppear {
+            secretsManager.reload()
+        }
+        .onChange(of: secretsManager.profileName) {oldVal, newVal in
+            secretsManager.reload()
         }
     }
     
@@ -64,9 +60,10 @@ struct SecretsTable: View {
     }
 }
 
-#Preview {
-    SecretsTable(profile: Binding(
-        get: { "development" },
-        set: { newValue in }
-    ))
-}
+//#Preview {
+//    SecretsTable()
+//    SecretsTable(profile: Binding(
+//        get: { "development" },
+//        set: { newValue in }
+//    ))
+//}

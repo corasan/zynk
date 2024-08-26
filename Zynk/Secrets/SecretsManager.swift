@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct Secret: Identifiable {
     let id = UUID()
@@ -14,14 +15,14 @@ struct Secret: Identifiable {
 }
 
 class SecretsManager: ObservableObject {
+    var projectName: String {
+        UserDefaults.standard.string(forKey: "lastOpenedProjectName") ?? ""
+    }
     @Published var secrets: [Secret] = []
     @Published var profileName: String {
         didSet {
             loadFromFile()
         }
-    }
-    var projectName: String {
-        UserDefaults.standard.string(forKey: "lastOpenedProjectName") ?? ""
     }
         
     init (profile: String) {
@@ -42,11 +43,16 @@ class SecretsManager: ObservableObject {
         }
     }
     
+    func reload() {
+        loadFromFile()
+    }
+    
     private func loadFromFile() {
         guard let appDirectory = getProjectDirectory() else { return }
         
         let fileName = ".env.\(profileName)"
         let fileURL = appDirectory.appendingPathComponent(fileName)
+        print("Loading from file: \(fileURL.path)")
         
         do {
             let content = try String(contentsOf: fileURL, encoding: .utf8)

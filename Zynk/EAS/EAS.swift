@@ -23,6 +23,7 @@ class EAS: ObservableObject {
     @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
     @AppStorage("cliPath") var cliPath: String = ""
     @AppStorage("lastOpenedProjectName") var lastOpenedProjectName: String = ""
+    @AppStorage("lastOpenedProfileName") var lastOpenedProfileName = ""
     
     init() {
         projectPath = lastOpenedProjectPath
@@ -87,6 +88,7 @@ class EAS: ObservableObject {
                                    channel: channel,
                                    distribution: distribution)
                 }
+                lastOpenedProfileName = profiles.first?.name ?? ""
                 errorMessage = nil
             } else {
                 errorMessage = "Failed to find 'build' key or it's not in the expected format"

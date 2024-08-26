@@ -42,6 +42,7 @@ struct OpenProjectView: View {
                             eas.projectPath = folder.path
                             lastOpenedProjectPath = folder.path
                             eas.readEASJson()
+                            eas.readAppJson()
                         }
                     case .failure(let error):
                         errorMessage = "Error selecting folder: \(error.localizedDescription)"
