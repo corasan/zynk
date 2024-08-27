@@ -7,17 +7,36 @@
 
 import SwiftUI
 
+struct CellWithPopOver: View {
+    @State private var showPopOver = false
+    var value: String
+    
+    var body: some View {
+        Button(action: { showPopOver.toggle() }) {
+            Text(String(repeating: "*", count: 25))
+        }
+        .popover(isPresented: $showPopOver) {
+            Text(value)
+                .font(.headline)
+                .padding()
+        }
+    }
+}
+
 struct SecretsTable: View {
     @State private var showAddSheet = false
     @State private var selectedRow: Secret.ID?
     @State private var sortOrder = [KeyPathComparator(\Secret.variable)]
+    @State private var showPopOver = false
     @EnvironmentObject var secretsManager: SecretsManager
 
     var body: some View {
         VStack {
             Table(secretsManager.secrets, selection: $selectedRow, sortOrder: $sortOrder) {
                 TableColumn("Variable", value: \.variable)
-                TableColumn("Value", value: \.value)
+                TableColumn("Value") { cell in
+                    CellWithPopOver(value: cell.value)
+                }
             }
             
             HStack {
