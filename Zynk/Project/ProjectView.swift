@@ -9,18 +9,12 @@ import SwiftUI
 
 struct ProjectView: View {
     @EnvironmentObject var eas: EAS
+    @EnvironmentObject var secretsManager: SecretsManager
     @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
     @AppStorage("lastOpenedProfileName") var lastOpenedProfileName = ""
     @State var selectedProfile: Profile?
     @State var isProjectSelected: Bool = false
     @State var profileName: String = ""
-    @StateObject var secretsManager: SecretsManager
-    
-    init() {
-        let secretsManager = SecretsManager(profile: "")
-        _secretsManager = StateObject(wrappedValue: secretsManager)
-        secretsManager.profileName = lastOpenedProfileName
-    }
     
     var body: some View {
         NavigationSplitView {
@@ -47,6 +41,7 @@ struct ProjectView: View {
                 }
                 .onAppear {
                     setProfileNameAndSelectedProfile(profiles: eas.profiles)
+                    AppCommands.addProjectToRecent(eas.projectPath)
                 }
                 .environmentObject(secretsManager)
             }

@@ -12,23 +12,17 @@ class EAS: ObservableObject {
     @Published var profiles: [Profile] = [Profile]()
     @State private var errorMessage: String?
     
-    @Published var projectPath: String = ""
     @Published var output: String = ""
     @Published var error: String?
     @Published var isLoading: Bool = false
-    @Published var projectName: String = ""
     @Published var isUpdateLoading: Bool = false
     @Published var isBuildLoading: Bool = false
     
-    @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
+    @AppStorage("lastOpenedProjectPath") var projectPath: String = ""
     @AppStorage("cliPath") var cliPath: String = ""
-    @AppStorage("lastOpenedProjectName") var lastOpenedProjectName: String = ""
+    @AppStorage("lastOpenedProjectName") var projectName: String = ""
     @AppStorage("lastOpenedProfileName") var lastOpenedProfileName = ""
     
-    init() {
-        projectPath = lastOpenedProjectPath
-        projectName = UserDefaults.standard.string(forKey: "lastOpenedProjectName") ?? ""
-    }
     
     func build(profile: String, platform: EASPlatform = .all) {
         isBuildLoading = true
@@ -75,12 +69,9 @@ class EAS: ObservableObject {
             if let dictionary = json as? [String: Any],
                let build = dictionary["build"] as? [String: [String: Any]] {
                 profiles = build.compactMap { (name, config) -> Profile? in
-                    guard let channel = config["channel"] as? String,
-                          let distributionString = config["distribution"] as? String,
-                          let distribution = DistributionType(rawValue: distributionString) else {
-                        return nil
-                    }
-                    
+                    let channel = config["channel"] as? String ?? ""
+                    let distributionString = config["distribution"] as? String ?? ""
+                    let distribution = DistributionType(rawValue: distributionString) ?? .internal
                     let developmentClient = config["developmentClient"] as? Bool ?? false
                     
                     return Profile(name: name,
@@ -88,6 +79,7 @@ class EAS: ObservableObject {
                                    channel: channel,
                                    distribution: distribution)
                 }
+                print("Open project profiles: \(profiles.map { $0.name })")
                 lastOpenedProfileName = profiles.first?.name ?? ""
                 errorMessage = nil
             } else {
@@ -105,7 +97,6 @@ class EAS: ObservableObject {
         do {
             let data = try Data(contentsOf: appJsonURL)
             let json = try JSONSerialization.jsonObject(with: data, options: [])
-            
             if let dictionary = json as? [String: Any] {
                 if let expo = dictionary["expo"] as? [String: Any] {
                     if let name = expo["name"] as? String {
@@ -158,6 +149,8 @@ class EAS: ObservableObject {
             errorMessage = "Error accessing project folder: \(error.localizedDescription)"
         }
     }
+    
+    
 }
 
 enum EASPlatform: String, CustomStringConvertible {

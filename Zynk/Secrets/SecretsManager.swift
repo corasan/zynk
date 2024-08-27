@@ -19,17 +19,12 @@ class SecretsManager: ObservableObject {
         UserDefaults.standard.string(forKey: "lastOpenedProjectName") ?? ""
     }
     @Published var secrets: [Secret] = []
-    @Published var profileName: String {
+    @Published var profileName: String = "" {
         didSet {
             loadFromFile()
         }
     }
         
-    init (profile: String) {
-        profileName = profile
-        loadFromFile()
-        copyEnvFile()
-    }
     
     func addItem(key: String, value: String) {
         secrets.append(Secret(variable: key, value: value))
@@ -77,10 +72,9 @@ class SecretsManager: ObservableObject {
                 self.secrets = newSecrets
             }
         } catch {
-//            print("Error reading file: \(error.localizedDescription)")
+            print("Error reading secrets file: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 self.secrets = []
-//                print("Cleared secrets array due to error")
             }
         }
     }

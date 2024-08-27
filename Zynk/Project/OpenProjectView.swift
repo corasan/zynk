@@ -43,6 +43,7 @@ struct OpenProjectView: View {
                             lastOpenedProjectPath = folder.path
                             eas.readEASJson()
                             eas.readAppJson()
+                            AppCommands.addProjectToRecent(folder.relativePath)
                         }
                     case .failure(let error):
                         errorMessage = "Error selecting folder: \(error.localizedDescription)"
