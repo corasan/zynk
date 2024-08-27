@@ -81,10 +81,10 @@ class EAS: ObservableObject {
                         return nil
                     }
                     
-                    let developmentBuild = config["developmentBuild"] as? Bool ?? false
+                    let developmentClient = config["developmentClient"] as? Bool ?? false
                     
                     return Profile(name: name,
-                                   developmentBuild: developmentBuild,
+                                   developmentClient: developmentClient,
                                    channel: channel,
                                    distribution: distribution)
                 }

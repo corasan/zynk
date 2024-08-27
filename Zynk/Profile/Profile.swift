@@ -35,7 +35,7 @@ enum DistributionType: String, CustomStringConvertible {
 struct Profile: Identifiable, Hashable {
     let id = UUID()
     let name: String
-    let developmentBuild: Bool
+    let developmentClient: Bool
     let channel: String
     let distribution: DistributionType
 }

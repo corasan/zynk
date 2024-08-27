@@ -52,7 +52,6 @@ class SecretsManager: ObservableObject {
         
         let fileName = ".env.\(profileName)"
         let fileURL = appDirectory.appendingPathComponent(fileName)
-        print("Loading from file: \(fileURL.path)")
         
         do {
             let content = try String(contentsOf: fileURL, encoding: .utf8)

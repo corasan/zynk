@@ -54,7 +54,7 @@ struct ProjectView: View {
                 OpenProjectView()
             }
         }
-        .navigationTitle(selectedProfile?.name.capitalized ?? "")
+        .navigationTitle(eas.projectName.capitalized)
         .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {
                 Menu {
