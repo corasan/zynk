@@ -52,7 +52,7 @@ struct ZynkApp: App {
         .windowResizability(.contentSize)
         .commands {
             CommandGroup(after: .newItem) {
-                Button("Open", action: {
+                Button("Open...", action: {
                     let recent = UserDefaults.standard.stringArray(forKey: "recentlyOpenedProjects") ?? []
                     print("Recent: \(recent)")
                     isShowingPicker.toggle()
