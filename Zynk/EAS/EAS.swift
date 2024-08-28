@@ -9,20 +9,21 @@ import Foundation
 import SwiftUI
 
 class EAS: ObservableObject {
-    @Published var profiles: [Profile] = [Profile]()
     @State private var errorMessage: String?
-    
+    @Published var profiles: [Profile] = [Profile]()
     @Published var output: String = ""
     @Published var error: String?
     @Published var isLoading: Bool = false
     @Published var isUpdateLoading: Bool = false
     @Published var isBuildLoading: Bool = false
-    
     @AppStorage("lastOpenedProjectPath") var projectPath: String = ""
     @AppStorage("cliPath") var cliPath: String = ""
     @AppStorage("lastOpenedProjectName") var projectName: String = ""
     @AppStorage("lastOpenedProfileName") var lastOpenedProfileName = ""
     
+    init() {
+        let _ = CLIUtils()
+    }
     
     func build(profile: String, platform: EASPlatform = .all) {
         isBuildLoading = true
