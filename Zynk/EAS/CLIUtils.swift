@@ -17,6 +17,10 @@ class CLIUtils {
         UserDefaults.standard.string(forKey: "lastOpenedProjectPath") ?? ""
     }
     
+    init() {
+        getEASCLIPath()
+    }
+    
     static func runEASCommand(_ arguments: [String]) -> (output: String?, error: String?) {
         guard !cliPath.isEmpty else {
             print("Error: EAS CLI path is not set.")
@@ -65,5 +69,39 @@ class CLIUtils {
         print("--- EAS Command Execution Completed ---")
         
         return (output.isEmpty ? nil : output, error.isEmpty ? nil : error)
+    }
+    
+    private func getEASCLIPath() {
+        let task = Process()
+        let outputPipe = Pipe()
+        let errorPipe = Pipe()
+        
+        let command = """
+            source ~/.zshrc
+            which eas
+        """
+        task.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        task.arguments = ["-c", command]
+        task.standardOutput = outputPipe
+        task.standardError = errorPipe
+        
+        print("here ->")
+        
+        do {
+            try task.run()
+            task.waitUntilExit()
+        } catch {
+            print("Failed to get EAS path: \(error.localizedDescription)")
+            return
+        }
+        
+        let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
+        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+        
+        let output = String(data: outputData, encoding: .utf8) ?? ""
+        let errorStr = String(data: errorData, encoding: .utf8) ?? ""
+        print("Error: \(errorStr)")
+        
+        UserDefaults.standard.set(output, forKey: "cliPath")
     }
 }
