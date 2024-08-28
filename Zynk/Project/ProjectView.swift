@@ -48,6 +48,9 @@ struct ProjectView: View {
             if eas.profiles.isEmpty {
                 OpenProjectView()
             }
+            if eas.profiles.isEmpty && eas.cliPath.isEmpty {
+                Text("EAS CLI path not found")
+            }
         }
         .navigationTitle(eas.projectName.capitalized)
         .toolbar {

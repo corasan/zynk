@@ -99,7 +99,8 @@ class CLIUtils {
         let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
         
         let output = String(data: outputData, encoding: .utf8) ?? ""
-//        let error = String(data: errorData, encoding: .utf8) ?? ""
+        let errorStr = String(data: errorData, encoding: .utf8) ?? ""
+        print("Error: \(errorStr)")
         
         UserDefaults.standard.set(output, forKey: "cliPath")
     }
