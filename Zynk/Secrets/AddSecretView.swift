@@ -25,68 +25,33 @@ struct AddSecretButton: View {
     }
 }
 
-struct NewSecret: Identifiable, Equatable {
-    let id: UUID
-    let variable: String
-    let value: String
-}
-
-class SecretsViewModel: ObservableObject {
-    @Published var secrets: [NewSecret] = []
-    
-    init() {
-        // Initialize with some sample data
-        secrets = [
-            NewSecret(id: UUID(), variable: "", value: ""),
-        ]
-    }
-    
-    func updateSecret(id: UUID, variable: String, value: String) {
-        if let index = secrets.firstIndex(where: { $0.id == id }) {
-            secrets[index] = NewSecret(id: id, variable: variable, value: value)
-        }
-    }
-    
-    func addSecret() {
-        let newSecret = NewSecret(id: UUID(), variable: "", value: "")
-        secrets.append(newSecret)
-    }
-    
-    func removeSecret(_ secret: NewSecret) {
-        let index = secrets.firstIndex(of: secret)
-        if let index = index {
-            secrets.remove(at: index)
-        }
-    }
-}
-
 struct AddSecretView: View {
     @Binding var isPresented: Bool
     @State private var variable = ""
     @State private var value = ""
     @EnvironmentObject var secretsManager: SecretsManager
-    @StateObject private var viewModel = SecretsViewModel()
+    @StateObject private var newSecretModel = NewSecretModel()
 
     var body: some View {
         VStack(alignment: .leading) {
             Text("Create")
                 .font(.title)
             LazyVStack {
-                ForEach($viewModel.secrets) { $secret in
+                ForEach($newSecretModel.secrets) { $secret in
                     HStack {
                         TextField("Variable", text: Binding(
                             get: { secret.variable },
-                            set: { viewModel.updateSecret(id: secret.id, variable: $0, value: secret.value) }
+                            set: { newSecretModel.updateSecret(id: secret.id, variable: $0, value: secret.value) }
                         ))
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         
                         TextField("Value", text: Binding(
                             get: { secret.value },
-                            set: { viewModel.updateSecret(id: secret.id, variable: secret.variable, value: $0) }
+                            set: { newSecretModel.updateSecret(id: secret.id, variable: secret.variable, value: $0) }
                         ))
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                        if $viewModel.secrets.count > 1 {
-                            Button(action: { viewModel.removeSecret(secret) }) {
+                        if $newSecretModel.secrets.count > 1 {
+                            Button(action: { newSecretModel.removeSecret(secret) }) {
                                 Image(systemName: "minus")
                             }
                         }
@@ -104,7 +69,7 @@ struct AddSecretView: View {
                 }
                 Spacer()
                 HStack {
-                    Button(action: { viewModel.addSecret()} ) {
+                    Button(action: { newSecretModel.addSecret()} ) {
                         HStack {
                             Image(systemName: "plus")
                             Text("Add more")
@@ -128,14 +93,14 @@ struct AddSecretView: View {
     }
     
     func saveSecret() {
-        for secret in viewModel.secrets {
+        for secret in newSecretModel.secrets {
             secretsManager.addItem(key: secret.variable, value: secret.value)
         }
         isPresented.toggle()
     }
     
     func isValid() -> Bool {
-        for secret in viewModel.secrets {
+        for secret in newSecretModel.secrets {
             if secret.variable.isEmpty || secret.value.isEmpty {
                 return false
             }
