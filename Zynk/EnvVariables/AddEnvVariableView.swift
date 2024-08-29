@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AddEnvVariableButton: View {
     @State private var isPresented = false
-
+    
     var body: some View {
         Button(action: {
             isPresented.toggle()
@@ -27,11 +27,9 @@ struct AddEnvVariableButton: View {
 
 struct AddEnvVariableView: View {
     @Binding var isPresented: Bool
-    @State private var variable = ""
-    @State private var value = ""
     @EnvironmentObject var envsModel: EnvVariablesModel
     @StateObject private var newVariableModel = NewVariableModel()
-
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text("Create")
@@ -39,17 +37,12 @@ struct AddEnvVariableView: View {
             LazyVStack {
                 ForEach($newVariableModel.variables) { $item in
                     HStack {
-                        TextField("Variable", text: Binding(
-                            get: { item.variable },
-                            set: { newVariableModel.updateNewVariable(id: item.id, variable: $0, value: item.value) }
-                        ))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        TextField("Variable", text: $item.variable)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
                         
-                        TextField("Value", text: Binding(
-                            get: { item.value },
-                            set: { newVariableModel.updateNewVariable(id: item.id, variable: item.variable, value: $0) }
-                        ))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        TextField("Value", text: $item.value)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        
                         if newVariableModel.variables.count > 1 {
                             Button(action: { newVariableModel.removeNewVariable(item) }) {
                                 Image(systemName: "minus")
@@ -59,7 +52,7 @@ struct AddEnvVariableView: View {
                 }
                 .fontWeight(.medium)
             }
-           
+            
             HStack {
                 Button(role: .cancel, action: {
                     isPresented.toggle()
@@ -69,7 +62,7 @@ struct AddEnvVariableView: View {
                 }
                 Spacer()
                 HStack {
-                    Button(action: { newVariableModel.addNewVariable()} ) {
+                    Button(action: { newVariableModel.addNewVariable() } ) {
                         HStack {
                             Image(systemName: "plus")
                             Text("Add more")
@@ -84,7 +77,6 @@ struct AddEnvVariableView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(!isValid())
                 }
-                
             }
             .fontWeight(.medium)
             .padding(.top, 16)
@@ -100,12 +92,7 @@ struct AddEnvVariableView: View {
     }
     
     func isValid() -> Bool {
-        for v in newVariableModel.variables {
-            if v.variable.isEmpty || v.value.isEmpty {
-                return false
-            }
-        }
-        return true
+        !newVariableModel.variables.contains { $0.variable.isEmpty || $0.value.isEmpty }
     }
 }
 
