@@ -22,8 +22,6 @@ struct CellWithPopOver: View {
             Text(popoverText)
                 .padding()
         }
-        .fontWeight(.medium)
-
     }
 }
 
@@ -42,7 +40,6 @@ struct SecretsTable: View {
                 }
                 TableColumn("Value") {
                     Text($0.value)
-                        .fontWeight(.medium)
                 }
 
             }
