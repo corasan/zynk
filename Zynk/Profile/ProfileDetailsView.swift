@@ -19,30 +19,14 @@ struct ProfileDetailsView: View {
                         .font(.largeTitle)
                         .fontWeight(.semibold)
                         .padding(.horizontal, 4)
-                    HStack {
-                        Image(systemName: profile.distribution == .store ? "storefront.fill" : "lock.fill")
-                            .font(.footnote)
-                        Text(profile.distribution.description)
-                            .font(.caption2)
-                    }
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(profile.distribution == .store ? Color.blue.opacity(0.2) : Color.purple.opacity(0.2))
-                    .clipShape(Capsule())
+                    Badge(
+                        text: profile.distribution.description,
+                        icon: profile.distribution == .store ? "storefront.fill" : "lock.fill",
+                        badgeType: profile.distribution == .store ? .store : .internal
+                    )
 
                     if profile.developmentClient {
-                        HStack {
-                            Image(systemName: "bolt.fill")
-                                .font(.footnote)
-                            Text("development")
-                                .font(.caption2)
-                        }
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.orange.opacity(0.2))
-                        .clipShape(Capsule())
+                        Badge(text: "development", icon: "bolt.fill", badgeType: .development)
                     }
                 }
                 Text("Updates channel: \(profile.channel.lowercased())")
