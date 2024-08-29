@@ -33,7 +33,7 @@ struct EnvVariablesTable: View {
     @EnvironmentObject var envsModel: EnvVariablesModel
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 0) {
             Dropzone {
                 Table(envsModel.variables, selection: $selectedRows) {
                     TableColumn("Variable") {
@@ -43,10 +43,7 @@ struct EnvVariablesTable: View {
                         Text($0.value)
                     }
                 }
-                .cornerRadius(8)
-                
             }
-            .padding(.horizontal, 16)
                         
             HStack {
                 AddEnvVariableButton()

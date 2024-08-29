@@ -19,15 +19,19 @@ struct Dropzone<Content: View>: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(.windowBackground)
+            RoundedRectangle(cornerRadius: 0)
+                .fill(isActive ? .blue.opacity(0.05) : .gray.opacity(0))
+                .animation(.easeIn(duration: 0.2), value: isActive)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: 0)
                         .stroke(isActive ? Color.blue : Color.gray, lineWidth: isActive ? 2 : 0)
-                        .animation(.easeInOut, value: isActive)
+                        .animation(.easeInOut(duration: 0.2), value: isActive)
+                        
                 )
+                .zIndex(isActive ? 1 : 10)
             content
         }
+        .padding(1)
         .frame(minHeight: 200)
         .onDrop(of: [UTType.fileURL], isTargeted: $isActive) { providers -> Bool in
             guard let provider = providers.first else { return false }

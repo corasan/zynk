@@ -29,7 +29,7 @@ struct ProfileDetailsView: View {
                         Badge(text: "development", icon: "bolt.fill", badgeType: .development)
                     }
                 }
-                Text("Updates channel: \(profile.channel.lowercased())")
+                Text("Updates channel: \(profile.channel.isEmpty ? profile.name : profile.channel)")
                     .padding(.horizontal, 4)
             }
             Spacer()

@@ -31,7 +31,7 @@ struct ProjectView: View {
             }
         } detail: {
             if !eas.profiles.isEmpty, let profile = selectedProfile {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading) {
                     ProfileDetailsView(profile: profile)
                     EnvVariablesTable()
                 }
