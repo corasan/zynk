@@ -27,7 +27,7 @@ struct CellWithPopOver: View {
 
 struct EnvVariablesTable: View {
     @State private var showAddSheet = false
-    @State private var selectedRow: Variable.ID?
+    @State private var selectedRows: Set<Variable.ID> = []
     @State private var sortOrder = [KeyPathComparator(\Variable.variable)]
     @State private var showPopOver = false
     @EnvironmentObject var envsModel: EnvVariablesModel
@@ -35,15 +35,14 @@ struct EnvVariablesTable: View {
     var body: some View {
         VStack(spacing: 16) {
             Dropzone {
-                Table(envsModel.variables, selection: $selectedRow, sortOrder: $sortOrder) {
-                    TableColumn("Variable", value: \.variable) {
+                Table(envsModel.variables, selection: $selectedRows) {
+                    TableColumn("Variable") {
                         CellWithPopOver(stringValue: $0.variable, popoverText: "process.env.\($0.variable)")
                     }
                     TableColumn("Value") {
                         Text($0.value)
                     }
                 }
-                
                 .cornerRadius(8)
                 
             }
@@ -86,8 +85,8 @@ struct EnvVariablesTable: View {
     
     func removeItem() {
         if !envsModel.variables.isEmpty {
-            if let selected = selectedRow {
-                if let index = envsModel.variables.firstIndex(where: { $0.id == selected}) {
+            for row in selectedRows {
+                if let index = envsModel.variables.firstIndex(where: { $0.id == row.self }) {
                     envsModel.removeItem(at: IndexSet(integer: index))
                 }
             }
