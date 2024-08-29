@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AddSecretButton: View {
+struct AddEnvVariableButton: View {
     @State private var isPresented = false
 
     var body: some View {
@@ -20,38 +20,38 @@ struct AddSecretButton: View {
                 .labelStyle(.iconOnly)
         }
         .sheet(isPresented: $isPresented) {
-            AddSecretView(isPresented: $isPresented)
+            AddEnvVariableView(isPresented: $isPresented)
         }
     }
 }
 
-struct AddSecretView: View {
+struct AddEnvVariableView: View {
     @Binding var isPresented: Bool
     @State private var variable = ""
     @State private var value = ""
-    @EnvironmentObject var secretsManager: SecretsManager
-    @StateObject private var newSecretModel = NewSecretModel()
+    @EnvironmentObject var envsModel: EnvVariablesModel
+    @StateObject private var newVariableModel = NewVariableModel()
 
     var body: some View {
         VStack(alignment: .leading) {
             Text("Create")
                 .font(.title)
             LazyVStack {
-                ForEach($newSecretModel.secrets) { $secret in
+                ForEach($newVariableModel.variables) { $item in
                     HStack {
                         TextField("Variable", text: Binding(
-                            get: { secret.variable },
-                            set: { newSecretModel.updateSecret(id: secret.id, variable: $0, value: secret.value) }
+                            get: { item.variable },
+                            set: { newVariableModel.updateNewVariable(id: item.id, variable: $0, value: item.value) }
                         ))
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         
                         TextField("Value", text: Binding(
-                            get: { secret.value },
-                            set: { newSecretModel.updateSecret(id: secret.id, variable: secret.variable, value: $0) }
+                            get: { item.value },
+                            set: { newVariableModel.updateNewVariable(id: item.id, variable: item.variable, value: $0) }
                         ))
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                        if $newSecretModel.secrets.count > 1 {
-                            Button(action: { newSecretModel.removeSecret(secret) }) {
+                        if newVariableModel.variables.count > 1 {
+                            Button(action: { newVariableModel.removeNewVariable(item) }) {
                                 Image(systemName: "minus")
                             }
                         }
@@ -69,7 +69,7 @@ struct AddSecretView: View {
                 }
                 Spacer()
                 HStack {
-                    Button(action: { newSecretModel.addSecret()} ) {
+                    Button(action: { newVariableModel.addNewVariable()} ) {
                         HStack {
                             Image(systemName: "plus")
                             Text("Add more")
@@ -93,15 +93,15 @@ struct AddSecretView: View {
     }
     
     func saveSecret() {
-        for secret in newSecretModel.secrets {
-            secretsManager.addItem(key: secret.variable, value: secret.value)
+        for v in newVariableModel.variables {
+            envsModel.addItem(key: v.variable, value: v.value)
         }
         isPresented.toggle()
     }
     
     func isValid() -> Bool {
-        for secret in newSecretModel.secrets {
-            if secret.variable.isEmpty || secret.value.isEmpty {
+        for v in newVariableModel.variables {
+            if v.variable.isEmpty || v.value.isEmpty {
                 return false
             }
         }
@@ -111,5 +111,5 @@ struct AddSecretView: View {
 
 #Preview("Add Secret") {
     @Previewable @State var isPresented = false
-    AddSecretView(isPresented: $isPresented)
+    AddEnvVariableView(isPresented: $isPresented)
 }

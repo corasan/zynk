@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProjectView: View {
     @EnvironmentObject var eas: EAS
-    @EnvironmentObject var secretsManager: SecretsManager
+    @EnvironmentObject var envsModel: EnvVariablesModel
     @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
     @AppStorage("lastOpenedProfileName") var lastOpenedProfileName = ""
     @State var selectedProfile: Profile?
@@ -26,7 +26,7 @@ struct ProjectView: View {
                 }
                 .onChange(of: selectedProfile, initial: true) { oldVal, newVal in
                     profileName = newVal?.name ?? ""
-                    secretsManager.profileName = profileName
+                    envsModel.profileName = profileName
                 }
             }
         } detail: {
@@ -35,7 +35,7 @@ struct ProjectView: View {
                     VStack(alignment: .leading) {
                         ProfileDetailsView(profile: profile)
                         Spacer()
-                        SecretsTable()
+                        EnvVariablesTable()
                     }
                     Spacer()
                 }
@@ -43,7 +43,7 @@ struct ProjectView: View {
                     setProfileNameAndSelectedProfile(profiles: eas.profiles)
                     AppCommands.addProjectToRecent(eas.projectPath)
                 }
-                .environmentObject(secretsManager)
+                .environmentObject(envsModel)
             }
             if eas.profiles.isEmpty {
                 OpenProjectView()
@@ -98,7 +98,7 @@ struct ProjectView: View {
         if selectedProfile == nil, let firstProfile = profiles.first {
             selectedProfile = firstProfile
             profileName = firstProfile.name
-            secretsManager.profileName = firstProfile.name
+            envsModel.profileName = firstProfile.name
         }
     }
 }

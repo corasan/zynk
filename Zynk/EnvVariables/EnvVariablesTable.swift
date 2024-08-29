@@ -25,17 +25,17 @@ struct CellWithPopOver: View {
     }
 }
 
-struct SecretsTable: View {
+struct EnvVariablesTable: View {
     @State private var showAddSheet = false
-    @State private var selectedRow: Secret.ID?
-    @State private var sortOrder = [KeyPathComparator(\Secret.variable)]
+    @State private var selectedRow: Variable.ID?
+    @State private var sortOrder = [KeyPathComparator(\Variable.variable)]
     @State private var showPopOver = false
-    @EnvironmentObject var secretsManager: SecretsManager
+    @EnvironmentObject var envsModel: EnvVariablesModel
     
     var body: some View {
         VStack {
             Dropzone {
-                Table(secretsManager.secrets, selection: $selectedRow, sortOrder: $sortOrder) {
+                Table(envsModel.variables, selection: $selectedRow, sortOrder: $sortOrder) {
                     TableColumn("Variable", value: \.variable) {
                         CellWithPopOver(stringValue: $0.variable, popoverText: "process.env.\($0.variable)")
                     }
@@ -47,7 +47,7 @@ struct SecretsTable: View {
             }
                         
             HStack {
-                AddSecretButton()
+                AddEnvVariableButton()
 
                 Button(action: removeItem) {
                     Label("Remove", systemImage: "minus")
@@ -62,17 +62,17 @@ struct SecretsTable: View {
             .background(Color(NSColor.windowBackgroundColor))
         }
         .frame(minWidth: 300, minHeight: 200)
-        .environmentObject(secretsManager)
+        .environmentObject(envsModel)
         .onAppear {
-            secretsManager.reload()
+            envsModel.reload()
         }
-        .onChange(of: secretsManager.profileName) {oldVal, newVal in
-            secretsManager.reload()
+        .onChange(of: envsModel.profileName) {oldVal, newVal in
+            envsModel.reload()
         }
-        .onChange(of: (secretsManager.didUpload)) { oldVal, newVal in
+        .onChange(of: (envsModel.didUpload)) { oldVal, newVal in
             if newVal {
-                secretsManager.reload()
-                secretsManager.didUpload = false
+                envsModel.reload()
+                envsModel.didUpload = false
             }
         }
     }
@@ -82,10 +82,10 @@ struct SecretsTable: View {
     }
     
     func removeItem() {
-        if !secretsManager.secrets.isEmpty {
+        if !envsModel.variables.isEmpty {
             if let selected = selectedRow {
-                if let index = secretsManager.secrets.firstIndex(where: { $0.id == selected}) {
-                    secretsManager.removeItem(at: IndexSet(integer: index))
+                if let index = envsModel.variables.firstIndex(where: { $0.id == selected}) {
+                    envsModel.removeItem(at: IndexSet(integer: index))
                 }
             }
         }
@@ -93,7 +93,7 @@ struct SecretsTable: View {
 }
 
 #Preview {
-    @Previewable @StateObject var secretsManager = SecretsManager()
-    SecretsTable()
-        .environmentObject(secretsManager)
+    @Previewable @StateObject var envsModel = EnvVariablesModel()
+    EnvVariablesTable()
+        .environmentObject(envsModel)
 }

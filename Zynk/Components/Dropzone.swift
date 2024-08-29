@@ -9,13 +9,11 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct Dropzone<Content: View>: View {
-//    @Binding var envVariables: [(key: String, value: String)]
     let content: Content
     @State private var isActive = false
-    @EnvironmentObject var envsManager: SecretsManager
+    @EnvironmentObject var envsManager: EnvVariablesModel
     
     init(@ViewBuilder content: () -> Content) {
-//        self._envVariables = envVariables
         self.content = content()
     }
 
@@ -82,8 +80,6 @@ struct Dropzone<Content: View>: View {
         do {
             try FileManager.default.createDirectory(at: zynkDirectory, withIntermediateDirectories: true, attributes: nil)
             try fileContent.write(to: fileURL, atomically: true, encoding: .utf8)
-            print("File written successfully to \(fileURL.path)")
-            print("Writing to file: \(fileContent)")
             envsManager.didUpload = true
         } catch {
             print("Error writing file: \(error.localizedDescription)")

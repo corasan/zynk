@@ -8,17 +8,17 @@
 import Foundation
 import SwiftUI
 
-struct Secret: Identifiable {
+struct Variable: Identifiable, Equatable {
     let id = UUID()
     var variable: String
     var value: String
 }
 
-class SecretsManager: ObservableObject {
+class EnvVariablesModel: ObservableObject {
     var projectName: String {
         UserDefaults.standard.string(forKey: "lastOpenedProjectName") ?? ""
     }
-    @Published var secrets: [Secret] = []
+    @Published var variables: [Variable] = []
     @Published var profileName: String = "" {
         didSet {
             loadFromFile()
@@ -27,13 +27,13 @@ class SecretsManager: ObservableObject {
     @Published var didUpload: Bool = false
     
     func addItem(key: String, value: String) {
-        secrets.append(Secret(variable: key, value: value))
+        variables.append(Variable(variable: key, value: value))
         writeToFile()
     }
     
     func removeItem(at offsets: IndexSet) {
-        if !secrets.isEmpty {
-            secrets.remove(atOffsets: offsets)
+        if !variables.isEmpty {
+            variables.remove(atOffsets: offsets)
             writeToFile()
         }
     }
@@ -52,7 +52,7 @@ class SecretsManager: ObservableObject {
             let content = try String(contentsOf: fileURL, encoding: .utf8)
             let lines = content.components(separatedBy: .newlines)
             
-            let newSecrets = lines.compactMap { line -> Secret? in
+            let newVariables = lines.compactMap { line -> Variable? in
                 let parts = line.components(separatedBy: "=")
                 guard parts.count == 2 else {
                     return nil
@@ -65,16 +65,16 @@ class SecretsManager: ObservableObject {
                     value = String(value.dropFirst().dropLast())
                 }
                 
-                return Secret(variable: variable, value: value)
+                return Variable(variable: variable, value: value)
             }
             
             DispatchQueue.main.async {
-                self.secrets = newSecrets
+                self.variables = newVariables
             }
         } catch {
             print("Error reading secrets file: \(error.localizedDescription)")
             DispatchQueue.main.async {
-                self.secrets = []
+                self.variables = []
             }
         }
     }
@@ -117,7 +117,7 @@ class SecretsManager: ObservableObject {
         }
         
         let fileName = ".env.\(profileName)"
-        let fileContent = secrets.map { "\($0.variable)=\"\($0.value)\"" }.joined(separator: "\n")
+        let fileContent = variables.map { "\($0.variable)=\"\($0.value)\"" }.joined(separator: "\n")
         let fileURL = appDirectory.appendingPathComponent(fileName)
         
         do {
