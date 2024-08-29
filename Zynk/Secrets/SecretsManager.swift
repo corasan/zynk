@@ -24,7 +24,7 @@ class SecretsManager: ObservableObject {
             loadFromFile()
         }
     }
-        
+    @Published var didUpload: Bool = false
     
     func addItem(key: String, value: String) {
         secrets.append(Secret(variable: key, value: value))
@@ -129,7 +129,7 @@ class SecretsManager: ObservableObject {
         }
     }
     
-    private func getProjectDirectory() -> URL? {
+    func getProjectDirectory() -> URL? {
         let homeDirectory = FileManager.default.homeDirectoryForCurrentUser
         let zynkDirectory = homeDirectory.appendingPathComponent(".zynk", isDirectory: true)
         let projectDirectory = zynkDirectory.appendingPathComponent(projectName, isDirectory: true)
