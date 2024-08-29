@@ -84,9 +84,7 @@ class CLIUtils {
         task.arguments = ["-c", command]
         task.standardOutput = outputPipe
         task.standardError = errorPipe
-        
-        print("here ->")
-        
+
         do {
             try task.run()
             task.waitUntilExit()
