@@ -69,7 +69,7 @@ struct AddSecretView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Add Secret")
+            Text("Create")
                 .font(.title)
             LazyVStack {
                 ForEach($viewModel.secrets) { $secret in
@@ -92,9 +92,8 @@ struct AddSecretView: View {
                         }
                     }
                 }
+                .fontWeight(.medium)
             }
-            .padding(.vertical, 6)
-            .padding(.horizontal, 4)
            
             HStack {
                 Button(role: .cancel, action: {
@@ -122,6 +121,7 @@ struct AddSecretView: View {
                 }
                 
             }
+            .fontWeight(.medium)
             .padding(.top, 16)
         }
         .padding()

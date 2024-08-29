@@ -9,17 +9,21 @@ import SwiftUI
 
 struct CellWithPopOver: View {
     @State private var showPopOver = false
-    var value: String
+    var stringValue: String
+    var popoverText: String
     
     var body: some View {
         Button(action: { showPopOver.toggle() }) {
-            Text(String(repeating: "*", count: 25))
+            Text(stringValue)
+                .foregroundStyle(.primary)
         }
+        .buttonStyle(.plain)
         .popover(isPresented: $showPopOver) {
-            Text(value)
-                .font(.headline)
+            Text(popoverText)
                 .padding()
         }
+        .fontWeight(.medium)
+
     }
 }
 
@@ -33,12 +37,16 @@ struct SecretsTable: View {
     var body: some View {
         VStack {
             Table(secretsManager.secrets, selection: $selectedRow, sortOrder: $sortOrder) {
-                TableColumn("Variable", value: \.variable)
-                TableColumn("Value") { cell in
-                    CellWithPopOver(value: cell.value)
+                TableColumn("Variable", value: \.variable) {
+                    CellWithPopOver(stringValue: $0.variable, popoverText: "process.env.\($0.variable)")
                 }
+                TableColumn("Value") {
+                    Text($0.value)
+                        .fontWeight(.medium)
+                }
+
             }
-            
+                        
             HStack {
                 AddSecretButton()
 
@@ -79,10 +87,8 @@ struct SecretsTable: View {
     }
 }
 
-//#Preview {
-//    SecretsTable()
-//    SecretsTable(profile: Binding(
-//        get: { "development" },
-//        set: { newValue in }
-//    ))
-//}
+#Preview {
+    @Previewable @StateObject var secretsManager = SecretsManager()
+    SecretsTable()
+        .environmentObject(secretsManager)
+}
