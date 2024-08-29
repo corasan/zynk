@@ -42,6 +42,33 @@ class EnvVariablesModel: ObservableObject {
         loadFromFile()
     }
     
+    func parseEnvFile(contents: String) {
+        var envs: [(key: String, value: String)] = []
+        let lines = contents.components(separatedBy: .newlines)
+        for line in lines {
+            let components = line.split(separator: "=", maxSplits: 1)
+            guard components.count == 2 else { continue }
+            let key = String(components[0])
+            let value = String(components[1])
+            envs.append((key: key, value: value))
+        }
+        
+        guard let zynkDirectory = getProjectDirectory() else {
+            print("Error: Could not get source directory")
+            return
+        }
+        let fileName = ".env.\(profileName)"
+        let fileContent = envs.map { "\($0.key)=\($0.value)" }.joined(separator: "\n")
+        let fileURL = zynkDirectory.appendingPathComponent(fileName)
+        do {
+            try FileManager.default.createDirectory(at: zynkDirectory, withIntermediateDirectories: true, attributes: nil)
+            try fileContent.write(to: fileURL, atomically: true, encoding: .utf8)
+            didUpload = true
+        } catch {
+            print("Error writing file: \(error.localizedDescription)")
+        }
+    }
+    
     private func loadFromFile() {
         guard let appDirectory = getProjectDirectory() else { return }
         
@@ -129,7 +156,7 @@ class EnvVariablesModel: ObservableObject {
         }
     }
     
-    func getProjectDirectory() -> URL? {
+    private func getProjectDirectory() -> URL? {
         let homeDirectory = FileManager.default.homeDirectoryForCurrentUser
         let zynkDirectory = homeDirectory.appendingPathComponent(".zynk", isDirectory: true)
         let projectDirectory = zynkDirectory.appendingPathComponent(projectName, isDirectory: true)

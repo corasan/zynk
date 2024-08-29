@@ -52,36 +52,9 @@ struct Dropzone<Content: View>: View {
         
         do {
             let contents = try String(contentsOf: url, encoding: .utf8)
-            parseEnvFile(contents: contents)
+            envsManager.parseEnvFile(contents: contents)
         } catch {
             print("Error reading file: \(error.localizedDescription)")
-        }
-    }
-    
-    private func parseEnvFile(contents: String) {
-        var envs: [(key: String, value: String)] = []
-        let lines = contents.components(separatedBy: .newlines)
-        for line in lines {
-            let components = line.split(separator: "=", maxSplits: 1)
-            guard components.count == 2 else { continue }
-            let key = String(components[0])
-            let value = String(components[1])
-            envs.append((key: key, value: value))
-        }
-        
-        guard let zynkDirectory = envsManager.getProjectDirectory() else {
-            print("Error: Could not get source directory")
-            return
-        }
-        let fileName = ".env.\(envsManager.profileName)"
-        let fileContent = envs.map { "\($0.key)=\($0.value)" }.joined(separator: "\n")
-        let fileURL = zynkDirectory.appendingPathComponent(fileName)
-        do {
-            try FileManager.default.createDirectory(at: zynkDirectory, withIntermediateDirectories: true, attributes: nil)
-            try fileContent.write(to: fileURL, atomically: true, encoding: .utf8)
-            envsManager.didUpload = true
-        } catch {
-            print("Error writing file: \(error.localizedDescription)")
         }
     }
 }
