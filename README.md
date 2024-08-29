@@ -11,7 +11,7 @@ Zynk is a lightweight macOS application with the whole purpose of making managin
 
 ## Installation
 
-You can download Zynk.dmg from the [releases page](https://github.com/henrypl/zynk/releases).
+You can download Zynk.pkg from the [releases page](https://github.com/henrypl/zynk/releases).
 
 ## Usage
 
