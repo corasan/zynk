@@ -31,19 +31,14 @@ struct ProjectView: View {
             }
         } detail: {
             if !eas.profiles.isEmpty, let profile = selectedProfile {
-                HStack {
-                    VStack(alignment: .leading) {
-                        ProfileDetailsView(profile: profile)
-                        Spacer()
-                        EnvVariablesTable()
-                    }
-                    Spacer()
+                VStack(alignment: .leading, spacing: 16) {
+                    ProfileDetailsView(profile: profile)
+                    EnvVariablesTable()
                 }
                 .onAppear {
                     setProfileNameAndSelectedProfile(profiles: eas.profiles)
                     AppCommands.addProjectToRecent(eas.projectPath)
                 }
-                .environmentObject(envsModel)
             }
             if eas.profiles.isEmpty {
                 OpenProjectView()
@@ -105,6 +100,8 @@ struct ProjectView: View {
 
 #Preview {
     @Previewable @State var eas = EAS()
+    @Previewable @State var envsModel = EnvVariablesModel()
     ProjectView()
         .environmentObject(eas)
+        .environmentObject(envsModel)
 }

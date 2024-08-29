@@ -13,11 +13,12 @@ struct ProfileDetailsView: View {
 
     var body: some View {
         HStack(alignment: .top) {
-            VStack(alignment: .leading) {
-                HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .center, spacing: 6) {
                     Text(profile.name.capitalized)
                         .font(.largeTitle)
                         .fontWeight(.semibold)
+                        .padding(.horizontal, 4)
                     HStack {
                         Image(systemName: profile.distribution == .store ? "storefront.fill" : "lock.fill")
                             .font(.footnote)
@@ -44,8 +45,8 @@ struct ProfileDetailsView: View {
                         .clipShape(Capsule())
                     }
                 }
-                .padding(.bottom, 6)
                 Text("Updates channel: \(profile.channel.lowercased())")
+                    .padding(.horizontal, 4)
             }
             Spacer()
             VStack(alignment: .trailing) {
@@ -64,9 +65,8 @@ struct ProfileDetailsView: View {
                     }
                 }
             }
-            .padding(.top, 4)
         }
-        .padding()
+        .padding(16)
     }
 }
 

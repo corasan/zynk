@@ -29,7 +29,6 @@ struct Dropzone<Content: View>: View {
             content
         }
         .frame(minHeight: 200)
-        .padding()
         .onDrop(of: [UTType.fileURL], isTargeted: $isActive) { providers -> Bool in
             guard let provider = providers.first else { return false }
             
