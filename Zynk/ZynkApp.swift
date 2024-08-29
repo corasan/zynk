@@ -77,18 +77,6 @@ struct ZynkApp: App {
                         print("Error selecting folder: \(error.localizedDescription)")
                     }
                 }
-//                Picker(selection: $selectedProject, label: Text("Open Recent")) {
-//                    ForEach(recentlyOpenedProjects, id: \.self) { path in
-//                        Button(path, action: {
-//                            eas.projectPath = path
-//                            lastOpenedProjectPath = path
-//                            eas.readEASJson()
-//                            eas.readAppJson()
-//                            secretsManager.reload()
-//                        })
-//                        .tag(path)
-//                    }
-//                }
             }
         }
     }

@@ -30,32 +30,82 @@ struct AddSecretView: View {
     @State private var variable = ""
     @State private var value = ""
     @EnvironmentObject var secretsManager: SecretsManager
+    @StateObject private var newSecretModel = NewSecretModel()
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Add Secret")
+            Text("Create")
                 .font(.title)
-            HStack(spacing: 8) {
-                TextField("Variable", text: $variable)
-                TextField("Value", text: $value)
+            LazyVStack {
+                ForEach($newSecretModel.secrets) { $secret in
+                    HStack {
+                        TextField("Variable", text: Binding(
+                            get: { secret.variable },
+                            set: { newSecretModel.updateSecret(id: secret.id, variable: $0, value: secret.value) }
+                        ))
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        
+                        TextField("Value", text: Binding(
+                            get: { secret.value },
+                            set: { newSecretModel.updateSecret(id: secret.id, variable: secret.variable, value: $0) }
+                        ))
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        if $newSecretModel.secrets.count > 1 {
+                            Button(action: { newSecretModel.removeSecret(secret) }) {
+                                Image(systemName: "minus")
+                            }
+                        }
+                    }
+                }
+                .fontWeight(.medium)
             }
+           
             HStack {
-                Button("Cancel",role: .cancel, action: {
+                Button(role: .cancel, action: {
                     isPresented.toggle()
-                })
+                }) {
+                    Text("Cancel")
+                        .padding(4)
+                }
                 Spacer()
-                Button("Save", action: saveSecret)
+                HStack {
+                    Button(action: { newSecretModel.addSecret()} ) {
+                        HStack {
+                            Image(systemName: "plus")
+                            Text("Add more")
+                        }
+                        .padding(4)
+                    }
+                    .buttonStyle(.bordered)
+                    Button(action: saveSecret) {
+                        Text("Save")
+                            .padding(4)
+                    }
                     .buttonStyle(.borderedProminent)
-                    .disabled(variable.isEmpty || value.isEmpty)
+                    .disabled(!isValid())
+                }
+                
             }
+            .fontWeight(.medium)
             .padding(.top, 16)
         }
         .padding()
     }
     
     func saveSecret() {
-        secretsManager.addItem(key: variable, value: value)
+        for secret in newSecretModel.secrets {
+            secretsManager.addItem(key: secret.variable, value: secret.value)
+        }
         isPresented.toggle()
+    }
+    
+    func isValid() -> Bool {
+        for secret in newSecretModel.secrets {
+            if secret.variable.isEmpty || secret.value.isEmpty {
+                return false
+            }
+        }
+        return true
     }
 }
 
