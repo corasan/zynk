@@ -31,17 +31,19 @@ struct SecretsTable: View {
     @State private var sortOrder = [KeyPathComparator(\Secret.variable)]
     @State private var showPopOver = false
     @EnvironmentObject var secretsManager: SecretsManager
-
+    
     var body: some View {
         VStack {
-            Table(secretsManager.secrets, selection: $selectedRow, sortOrder: $sortOrder) {
-                TableColumn("Variable", value: \.variable) {
-                    CellWithPopOver(stringValue: $0.variable, popoverText: "process.env.\($0.variable)")
+            Dropzone {
+                Table(secretsManager.secrets, selection: $selectedRow, sortOrder: $sortOrder) {
+                    TableColumn("Variable", value: \.variable) {
+                        CellWithPopOver(stringValue: $0.variable, popoverText: "process.env.\($0.variable)")
+                    }
+                    TableColumn("Value") {
+                        Text($0.value)
+                    }
                 }
-                TableColumn("Value") {
-                    Text($0.value)
-                }
-
+                .cornerRadius(8)
             }
                         
             HStack {
@@ -66,6 +68,12 @@ struct SecretsTable: View {
         }
         .onChange(of: secretsManager.profileName) {oldVal, newVal in
             secretsManager.reload()
+        }
+        .onChange(of: (secretsManager.didUpload)) { oldVal, newVal in
+            if newVal {
+                secretsManager.reload()
+                secretsManager.didUpload = false
+            }
         }
     }
     
