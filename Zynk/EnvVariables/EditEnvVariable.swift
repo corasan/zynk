@@ -24,7 +24,9 @@ struct EditEnvVariableView: View {
     }
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
+            Text("Edit")
+                .font(.title)
             HStack {
                 TextField("Variable", text: $variable)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
