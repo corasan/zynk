@@ -10,6 +10,7 @@ import SwiftUI
 struct EnvVariablesTable: View {
     @State private var showAddSheet = false
     @State private var selectedRows: Set<Variable.ID> = []
+    @State private var selectedRow: Variable.ID?
     @State private var sortOrder = [KeyPathComparator(\Variable.variable)]
     @State private var showPopOver = false
     @EnvironmentObject var envsModel: EnvVariablesModel
@@ -17,16 +18,36 @@ struct EnvVariablesTable: View {
     var body: some View {
         VStack(spacing: 0) {
             Dropzone {
-                Table(envsModel.variables, selection: $selectedRows) {
+                Table(of: Variable.self, selection: $selectedRows) {
                     TableColumn("Variable", value: \.variable)
                     TableColumn("Value", value: \.value)
+                } rows: {
+                    ForEach(envsModel.variables) { variable in
+                        TableRow(variable)
+                            .contextMenu {
+                                Button(action: {
+                                    print("Hello World!")
+                                }) {
+                                    HStack {
+                                        Image(systemName: "pencil")
+                                        Text("Edit")
+                                    }
+                                }
+                                Button(role: .destructive, action: { removeItem(variable.id) }) {
+                                    HStack {
+                                        Image(systemName: "trash")
+                                        Text("Delete")
+                                    }
+                                }
+                            }
+                    }
                 }
             }
                         
             HStack {
                 AddEnvVariableButton()
 
-                Button(action: removeItem) {
+                Button(action: removeSelectedRows) {
                     Label("Remove", systemImage: "minus")
                         .foregroundStyle(.foreground)
                         .fontWeight(.medium)
@@ -58,7 +79,15 @@ struct EnvVariablesTable: View {
         showAddSheet.toggle()
     }
     
-    func removeItem() {
+    func removeItem(_ id: UUID?) {
+        if !envsModel.variables.isEmpty {
+            if let index = envsModel.variables.firstIndex(where: { $0.id == id }) {
+                envsModel.removeItem(at: IndexSet(integer: index))
+            }
+        }
+    }
+    
+    func removeSelectedRows() {
         if !envsModel.variables.isEmpty {
             for row in selectedRows {
                 if let index = envsModel.variables.firstIndex(where: { $0.id == row.self }) {
