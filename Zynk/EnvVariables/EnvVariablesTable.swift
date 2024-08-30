@@ -7,24 +7,6 @@
 
 import SwiftUI
 
-struct CellWithPopOver: View {
-    @State private var showPopOver = false
-    var stringValue: String
-    var popoverText: String
-    
-    var body: some View {
-        Button(action: { showPopOver.toggle() }) {
-            Text(stringValue)
-                .foregroundStyle(.primary)
-        }
-        .buttonStyle(.plain)
-        .popover(isPresented: $showPopOver) {
-            Text(popoverText)
-                .padding()
-        }
-    }
-}
-
 struct EnvVariablesTable: View {
     @State private var showAddSheet = false
     @State private var selectedRows: Set<Variable.ID> = []
@@ -36,12 +18,8 @@ struct EnvVariablesTable: View {
         VStack(spacing: 0) {
             Dropzone {
                 Table(envsModel.variables, selection: $selectedRows) {
-                    TableColumn("Variable") {
-                        CellWithPopOver(stringValue: $0.variable, popoverText: "process.env.\($0.variable)")
-                    }
-                    TableColumn("Value") {
-                        Text($0.value)
-                    }
+                    TableColumn("Variable", value: \.variable)
+                    TableColumn("Value", value: \.value)
                 }
             }
                         
