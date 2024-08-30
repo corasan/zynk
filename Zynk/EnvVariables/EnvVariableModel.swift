@@ -31,10 +31,28 @@ class EnvVariablesModel: ObservableObject {
         writeToFile()
     }
     
-    func removeItem(at offsets: IndexSet) {
+    func editItem(at index: Int, key: String, value: String) {
         if !variables.isEmpty {
-            variables.remove(atOffsets: offsets)
+            variables[index].variable = key
+            variables[index].value = value
             writeToFile()
+        }
+    }
+    
+    func removeItem(id: UUID) {
+        if !variables.isEmpty {
+            if let index = variables.firstIndex(where: { $0.id == id }) {
+                variables.remove(atOffsets: IndexSet(integer: index))
+                writeToFile()
+            }
+        }
+    }
+    
+    func removeSelectedItems(items: Set<Variable.ID>) {
+        if !variables.isEmpty {
+            for item in items {
+                removeItem(id: item.self)
+            }
         }
     }
     

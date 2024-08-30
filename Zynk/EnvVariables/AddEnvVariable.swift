@@ -20,13 +20,13 @@ struct AddEnvVariableButton: View {
                 .labelStyle(.iconOnly)
         }
         .sheet(isPresented: $isPresented) {
-            AddEnvVariableView(isPresented: $isPresented)
+            AddEnvVariableView()
         }
     }
 }
 
 struct AddEnvVariableView: View {
-    @Binding var isPresented: Bool
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var envsModel: EnvVariablesModel
     @StateObject private var newVariableModel = NewVariableModel()
     
@@ -54,9 +54,7 @@ struct AddEnvVariableView: View {
             }
             
             HStack {
-                Button(role: .cancel, action: {
-                    isPresented.toggle()
-                }) {
+                Button(role: .cancel, action: { dismiss() }) {
                     Text("Cancel")
                         .padding(4)
                 }
@@ -70,7 +68,7 @@ struct AddEnvVariableView: View {
                         .padding(4)
                     }
                     .buttonStyle(.bordered)
-                    Button(action: saveSecret) {
+                    Button(action: saveVariable) {
                         Text("Save")
                             .padding(4)
                     }
@@ -84,11 +82,11 @@ struct AddEnvVariableView: View {
         .padding()
     }
     
-    func saveSecret() {
+    func saveVariable() {
         for v in newVariableModel.variables {
             envsModel.addItem(key: v.variable, value: v.value)
         }
-        isPresented.toggle()
+        dismiss()
     }
     
     func isValid() -> Bool {
@@ -97,6 +95,5 @@ struct AddEnvVariableView: View {
 }
 
 #Preview("Add Secret") {
-    @Previewable @State var isPresented = false
-    AddEnvVariableView(isPresented: $isPresented)
+    AddEnvVariableView()
 }
