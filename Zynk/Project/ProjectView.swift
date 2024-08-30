@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProjectView: View {
     @EnvironmentObject var eas: EAS
-    @EnvironmentObject var secretsManager: SecretsManager
+    @EnvironmentObject var envsModel: EnvVariablesModel
     @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
     @AppStorage("lastOpenedProfileName") var lastOpenedProfileName = ""
     @State var selectedProfile: Profile?
@@ -26,24 +26,19 @@ struct ProjectView: View {
                 }
                 .onChange(of: selectedProfile, initial: true) { oldVal, newVal in
                     profileName = newVal?.name ?? ""
-                    secretsManager.profileName = profileName
+                    envsModel.profileName = profileName
                 }
             }
         } detail: {
             if !eas.profiles.isEmpty, let profile = selectedProfile {
-                HStack {
-                    VStack(alignment: .leading) {
-                        ProfileDetailsView(profile: profile)
-                        Spacer()
-                        SecretsTable()
-                    }
-                    Spacer()
+                VStack(alignment: .leading) {
+                    ProfileDetailsView(profile: profile)
+                    EnvVariablesTable()
                 }
                 .onAppear {
                     setProfileNameAndSelectedProfile(profiles: eas.profiles)
                     AppCommands.addProjectToRecent(eas.projectPath)
                 }
-                .environmentObject(secretsManager)
             }
             if eas.profiles.isEmpty {
                 OpenProjectView()
@@ -98,13 +93,15 @@ struct ProjectView: View {
         if selectedProfile == nil, let firstProfile = profiles.first {
             selectedProfile = firstProfile
             profileName = firstProfile.name
-            secretsManager.profileName = firstProfile.name
+            envsModel.profileName = firstProfile.name
         }
     }
 }
 
 #Preview {
     @Previewable @State var eas = EAS()
+    @Previewable @State var envsModel = EnvVariablesModel()
     ProjectView()
         .environmentObject(eas)
+        .environmentObject(envsModel)
 }

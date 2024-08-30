@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct AddSecretButton: View {
+struct AddEnvVariableButton: View {
     @State private var isPresented = false
-
+    
     var body: some View {
         Button(action: {
             isPresented.toggle()
@@ -20,38 +20,31 @@ struct AddSecretButton: View {
                 .labelStyle(.iconOnly)
         }
         .sheet(isPresented: $isPresented) {
-            AddSecretView(isPresented: $isPresented)
+            AddEnvVariableView(isPresented: $isPresented)
         }
     }
 }
 
-struct AddSecretView: View {
+struct AddEnvVariableView: View {
     @Binding var isPresented: Bool
-    @State private var variable = ""
-    @State private var value = ""
-    @EnvironmentObject var secretsManager: SecretsManager
-    @StateObject private var newSecretModel = NewSecretModel()
-
+    @EnvironmentObject var envsModel: EnvVariablesModel
+    @StateObject private var newVariableModel = NewVariableModel()
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text("Create")
                 .font(.title)
             LazyVStack {
-                ForEach($newSecretModel.secrets) { $secret in
+                ForEach($newVariableModel.variables) { $item in
                     HStack {
-                        TextField("Variable", text: Binding(
-                            get: { secret.variable },
-                            set: { newSecretModel.updateSecret(id: secret.id, variable: $0, value: secret.value) }
-                        ))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        TextField("Variable", text: $item.variable)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
                         
-                        TextField("Value", text: Binding(
-                            get: { secret.value },
-                            set: { newSecretModel.updateSecret(id: secret.id, variable: secret.variable, value: $0) }
-                        ))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        if $newSecretModel.secrets.count > 1 {
-                            Button(action: { newSecretModel.removeSecret(secret) }) {
+                        TextField("Value", text: $item.value)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        
+                        if newVariableModel.variables.count > 1 {
+                            Button(action: { newVariableModel.removeNewVariable(item) }) {
                                 Image(systemName: "minus")
                             }
                         }
@@ -59,7 +52,7 @@ struct AddSecretView: View {
                 }
                 .fontWeight(.medium)
             }
-           
+            
             HStack {
                 Button(role: .cancel, action: {
                     isPresented.toggle()
@@ -69,7 +62,7 @@ struct AddSecretView: View {
                 }
                 Spacer()
                 HStack {
-                    Button(action: { newSecretModel.addSecret()} ) {
+                    Button(action: { newVariableModel.addNewVariable() } ) {
                         HStack {
                             Image(systemName: "plus")
                             Text("Add more")
@@ -84,7 +77,6 @@ struct AddSecretView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(!isValid())
                 }
-                
             }
             .fontWeight(.medium)
             .padding(.top, 16)
@@ -93,23 +85,18 @@ struct AddSecretView: View {
     }
     
     func saveSecret() {
-        for secret in newSecretModel.secrets {
-            secretsManager.addItem(key: secret.variable, value: secret.value)
+        for v in newVariableModel.variables {
+            envsModel.addItem(key: v.variable, value: v.value)
         }
         isPresented.toggle()
     }
     
     func isValid() -> Bool {
-        for secret in newSecretModel.secrets {
-            if secret.variable.isEmpty || secret.value.isEmpty {
-                return false
-            }
-        }
-        return true
+        !newVariableModel.variables.contains { $0.variable.isEmpty || $0.value.isEmpty }
     }
 }
 
 #Preview("Add Secret") {
     @Previewable @State var isPresented = false
-    AddSecretView(isPresented: $isPresented)
+    AddEnvVariableView(isPresented: $isPresented)
 }

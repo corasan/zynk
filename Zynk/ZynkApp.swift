@@ -7,38 +7,25 @@
 
 import SwiftUI
 
-class MyAppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
-    @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
-    @Environment(\.openWindow) var openWindow
-
-    func application(
-        _ application: NSApplication
-    ) {
-        if !lastOpenedProjectPath.isEmpty {
-            openWindow(id: "open-project")
-        }
-    }
-}
-
 @main
 struct ZynkApp: App {
     @State private var isProjectSelected = false
     @State private var profiles: [Profile] = []
     @State private var projectPath: URL?
-    @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
-    @StateObject var eas: EAS
-    @StateObject var secretsManager: SecretsManager
     @State private var selectedProject: String = ""
     @State private var isShowingPicker = false
+    @AppStorage("lastOpenedProjectPath") var lastOpenedProjectPath: String = ""
+    @StateObject var eas: EAS
+    @StateObject var envsModel: EnvVariablesModel
     private var recentlyOpenedProjects: [String] {
         UserDefaults.standard.stringArray(forKey: "recentlyOpenedProjects") ?? []
     }
     
     init() {
         let eas = EAS()
-        let secretsManager = SecretsManager()
+        let envsModel = EnvVariablesModel()
         _eas = StateObject(wrappedValue: eas)
-        _secretsManager = StateObject(wrappedValue: secretsManager)
+        _envsModel = StateObject(wrappedValue: envsModel)
     }
     
     var body: some Scene {
@@ -46,7 +33,7 @@ struct ZynkApp: App {
             ProjectView()
                 .frame(minWidth: 850, minHeight: 500)
                 .environmentObject(eas)
-                .environmentObject(secretsManager)
+                .environmentObject(envsModel)
             
         }
         .windowResizability(.contentSize)
@@ -70,7 +57,7 @@ struct ZynkApp: App {
                             lastOpenedProjectPath = folder.path
                             eas.readEASJson()
                             eas.readAppJson()
-                            secretsManager.reload()
+                            envsModel.reload()
                             AppCommands.addProjectToRecent(folder.relativePath)
                         }
                     case .failure(let error):
