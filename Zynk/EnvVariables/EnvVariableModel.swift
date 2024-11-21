@@ -92,7 +92,7 @@ class EnvVariablesModel: ObservableObject {
         
         let fileName = ".env.\(profileName)"
         let fileURL = appDirectory.appendingPathComponent(fileName)
-        
+                
         do {
             let content = try String(contentsOf: fileURL, encoding: .utf8)
             let lines = content.components(separatedBy: .newlines)
@@ -112,12 +112,13 @@ class EnvVariablesModel: ObservableObject {
                 
                 return Variable(variable: variable, value: value)
             }
-            
+
             DispatchQueue.main.async {
                 self.variables = newVariables
+                self.copyEnvFile()
             }
         } catch {
-            print("Error reading secrets file: \(error.localizedDescription)")
+            print("Error reading .env.* file: \(error.localizedDescription)")
             DispatchQueue.main.async {
                 self.variables = []
             }
