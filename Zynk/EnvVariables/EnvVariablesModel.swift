@@ -71,20 +71,8 @@ class EnvVariablesModel: ObservableObject {
             envs.append((key: key, value: value))
         }
         
-        guard let zynkDirectory = getProjectDirectory() else {
-            print("Error: Could not get source directory")
-            return
-        }
-        let fileName = ".env.\(profileName)"
-        let fileContent = envs.map { "\($0.key)=\($0.value)" }.joined(separator: "\n")
-        let fileURL = zynkDirectory.appendingPathComponent(fileName)
-        do {
-            try FileManager.default.createDirectory(at: zynkDirectory, withIntermediateDirectories: true, attributes: nil)
-            try fileContent.write(to: fileURL, atomically: true, encoding: .utf8)
-            didUpload = true
-        } catch {
-            print("Error writing file: \(error.localizedDescription)")
-        }
+        writeToFile()
+        didUpload = true
     }
     
     private func loadFromFile() {
