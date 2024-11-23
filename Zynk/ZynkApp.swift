@@ -66,5 +66,9 @@ struct ZynkApp: App {
                 }
             }
         }
+        
+        Settings {
+            SettingsView()
+        }
     }
 }
