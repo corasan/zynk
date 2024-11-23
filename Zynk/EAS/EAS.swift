@@ -39,6 +39,10 @@ class EAS: ObservableObject {
         }
     }
     
+    func pullEnvVariables(profile: String, environment: String) {
+        runCommand(["env:pull", "--environment", environment, "--profile"]) { _ in }
+    }
+    
     private func runCommand(_ arguments: [String], completion: @escaping (Bool) -> Void) {
         isLoading = true
         
