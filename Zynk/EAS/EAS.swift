@@ -16,6 +16,7 @@ class EAS: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var isUpdateLoading: Bool = false
     @Published var isBuildLoading: Bool = false
+    @Published var isEnvironmentVarsLoading: Bool = false
     @AppStorage("lastOpenedProjectPath") var projectPath: String = ""
     @AppStorage("cliPath") var cliPath: String = ""
     @AppStorage("lastOpenedProjectName") var projectName: String = ""
@@ -36,6 +37,14 @@ class EAS: ObservableObject {
         isUpdateLoading = true
         runCommand(["update", "--branch", profile,  "--platform", platform.description, "--auto"]) { loading in
             self.isUpdateLoading = loading
+        }
+    }
+    
+    func pullEnvVariables(profile: String, environment: String, callback: (() -> Void)? = nil) {
+        isEnvironmentVarsLoading = true
+        runCommand(["env:pull", "--environment", environment, "--non-interactive"]) { loading in
+            self.isEnvironmentVarsLoading = loading
+            callback?()
         }
     }
     

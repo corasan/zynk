@@ -29,6 +29,7 @@ class EnvVariablesModel: ObservableObject {
     func addItem(key: String, value: String) {
         variables.append(Variable(variable: key, value: value))
         writeToFile()
+        reload()
     }
     
     func editItem(at index: Int, key: String, value: String) {
@@ -36,6 +37,7 @@ class EnvVariablesModel: ObservableObject {
             variables[index].variable = key
             variables[index].value = value
             writeToFile()
+            reload()
         }
     }
     
@@ -44,6 +46,7 @@ class EnvVariablesModel: ObservableObject {
             if let index = variables.firstIndex(where: { $0.id == id }) {
                 variables.remove(atOffsets: IndexSet(integer: index))
                 writeToFile()
+                reload()
             }
         }
     }
@@ -53,6 +56,7 @@ class EnvVariablesModel: ObservableObject {
             for item in items {
                 removeItem(id: item.self)
             }
+            reload()
         }
     }
     
@@ -127,7 +131,6 @@ class EnvVariablesModel: ObservableObject {
     
     private func copyEnvFile() {
         guard let sourceDirectory = getProjectDirectory() else {
-//            print("Error: Could not get source directory")
             return
         }
         
@@ -135,7 +138,6 @@ class EnvVariablesModel: ObservableObject {
         let sourceURL = sourceDirectory.appendingPathComponent(sourceFileName)
         
         guard let destinationPath = UserDefaults.standard.string(forKey: "lastOpenedProjectPath") else {
-//            print("Error: No project path found in UserDefaults")
             return
         }
         
@@ -143,16 +145,38 @@ class EnvVariablesModel: ObservableObject {
 
         // Read the contents of the source file
         guard let sourceData = FileManager.default.contents(atPath: sourceURL.path) else {
-//            print("Error: Could not read source file at \(sourceURL.path)")
             return
         }
                 
         do {
             // Write the contents to the destination file
             try sourceData.write(to: destinationURL, options: .atomic)
-//            print("File successfully copied to \(destinationURL.path)")
         } catch {
-//            print("Error writing file: \(error.localizedDescription)")
+        }
+    }
+    
+    func copyLocalEnvToZynkDir() {
+        guard let zynkPath = getProjectDirectory() else {
+            return
+        }
+        let destinationURL = zynkPath.appendingPathComponent(".env.\(profileName)")
+        
+        guard let sourceAppDirectory = UserDefaults.standard.string(forKey: "lastOpenedProjectPath") else {
+            return
+        }
+        
+        let sourceURL = URL(fileURLWithPath: sourceAppDirectory).appendingPathComponent(".env.local")
+        
+        guard let sourceData = FileManager.default.contents(atPath: sourceURL.path) else {
+            print("Error: Unable to read .env.local file from \(sourceURL.path)")
+            return
+        }
+        
+        do {
+            try sourceData.write(to: destinationURL, options: .atomic)
+            reload()
+        } catch {
+            print("Could not write .env.local file to \(destinationURL.path). Error: \(error.localizedDescription)")
         }
     }
     

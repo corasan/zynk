@@ -15,6 +15,7 @@ struct ProjectView: View {
     @State var selectedProfile: Profile?
     @State var isProjectSelected: Bool = false
     @State var profileName: String = ""
+    @State var val = false
     
     var body: some View {
         NavigationSplitView {
@@ -66,6 +67,11 @@ struct ProjectView: View {
                     Label("Update", systemImage: "icloud.and.arrow.up")
                         .labelStyle(.iconOnly)
                 }
+                Button { pullEnvironmentVariables() } label: {
+                    Image(systemName: "ellipsis.curlybraces")
+                        .symbolEffectsRemoved(!eas.isEnvironmentVarsLoading)
+                        .symbolEffect(.variableColor.cumulative.hideInactiveLayers.nonReversing, options: eas.isEnvironmentVarsLoading ? .repeating : .nonRepeating)
+                }
             }
         }
         .onAppear {
@@ -87,6 +93,13 @@ struct ProjectView: View {
     func update(_ platform: EASPlatform = .all) {
         let name = selectedProfile?.name ?? ""
         eas.update(profile: name, platform: platform)
+    }
+    
+    func pullEnvironmentVariables() {
+        let name = selectedProfile?.name ?? ""
+        eas.pullEnvVariables(profile: name, environment: envsModel.profileName) {
+            envsModel.copyLocalEnvToZynkDir()
+        }
     }
     
     func setProfileNameAndSelectedProfile(profiles: [Profile]) {
