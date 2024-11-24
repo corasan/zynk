@@ -29,6 +29,7 @@ class EnvVariablesModel: ObservableObject {
     func addItem(key: String, value: String) {
         variables.append(Variable(variable: key, value: value))
         writeToFile()
+        reload()
     }
     
     func editItem(at index: Int, key: String, value: String) {
@@ -36,6 +37,7 @@ class EnvVariablesModel: ObservableObject {
             variables[index].variable = key
             variables[index].value = value
             writeToFile()
+            reload()
         }
     }
     
@@ -44,6 +46,7 @@ class EnvVariablesModel: ObservableObject {
             if let index = variables.firstIndex(where: { $0.id == id }) {
                 variables.remove(atOffsets: IndexSet(integer: index))
                 writeToFile()
+                reload()
             }
         }
     }
@@ -53,6 +56,7 @@ class EnvVariablesModel: ObservableObject {
             for item in items {
                 removeItem(id: item.self)
             }
+            reload()
         }
     }
     
