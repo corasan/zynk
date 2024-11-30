@@ -14,19 +14,28 @@ struct ProfileDetailsView: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .center, spacing: 6) {
-                    Text(profile.name.capitalized)
-                        .font(.largeTitle)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 4)
-                    Badge(
-                        text: profile.distribution.description,
-                        icon: profile.distribution == .store ? "storefront.fill" : "lock.fill",
-                        badgeType: profile.distribution == .store ? .store : .internal
-                    )
-
-                    if profile.developmentClient {
-                        Badge(text: "development", icon: "bolt.fill", badgeType: .development)
+                HStack {
+                    HStack(alignment: .center, spacing: 6) {
+                        Text(profile.name.capitalized)
+                            .font(.largeTitle)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal, 4)
+                        Badge(
+                            text: profile.distribution.description,
+                            icon: profile.distribution == .store ? "storefront.fill" : "lock.fill",
+                            badgeType: profile.distribution == .store ? .store : .internal
+                        )
+                        
+                        if profile.developmentClient {
+                            Badge(text: "development", icon: "bolt.fill", badgeType: .development)
+                        }
+                    }
+                    Spacer()
+                    
+                    HStack {
+                        Button(action: {}, label: {
+                            Text("Select environment")
+                        })
                     }
                 }
                 Text("Updates channel: \(profile.channel.isEmpty ? profile.name : profile.channel)")
