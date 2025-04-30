@@ -116,7 +116,7 @@ class EnvVariablesModel: ObservableObject {
                 
                 return Variable(variable: variable, value: value)
             }
-
+            
             DispatchQueue.main.async {
                 self.variables = newVariables
                 self.copyEnvFile()
